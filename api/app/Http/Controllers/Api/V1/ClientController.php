@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Clients\IndexClientRequest;
+use App\Http\Requests\Api\V1\Clients\StoreClientRequest;
+use App\Http\Resources\ClientResource;
+use App\Models\Client;
+use App\Services\Clients\ClientRegistrationService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\Response;
+
+final class ClientController extends Controller
+{
+    public function __construct(
+        private readonly ClientRegistrationService $registration,
+    ) {}
+
+    public function index(IndexClientRequest $request): AnonymousResourceCollection
+    {
+        $clients = Client::query()
+            ->with(['recruiter', 'latestAffordability'])
+            ->when(
+                $request->filled('search'),
+                fn ($query) => $query->search($request->string('search')->value()),
+            )
+            ->when(
+                $request->filled('recruiter_id'),
+                fn ($query) => $query->where('recruiter_id', $request->integer('recruiter_id')),
+            )
+            ->orderBy(
+                $request->string('sort', 'created_at')->value(),
+                $request->string('direction', 'desc')->value(),
+            )
+            ->paginate($request->integer('per_page', 15))
+            ->withQueryString();
+
+        return ClientResource::collection($clients);
+    }
+
+    public function store(StoreClientRequest $request): JsonResponse
+    {
+        $client = $this->registration->register(
+            client: $request->safe()->except(['affordability', 'new_recruiter']),
+            affordability: $request->validated('affordability'),
+            registeredBy: $request->user(),
+            newRecruiter: $request->validated('new_recruiter'),
+            ipAddress: $request->ip(),
+        );
+
+        return (new ClientResource($client))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    public function show(Client $client): ClientResource
+    {
+        return new ClientResource(
+            $client->load(['recruiter', 'latestAffordability', 'registeredBy']),
+        );
+    }
+}
