@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\RecruiterController;
 use App\Http\Controllers\Api\V1\ReferenceController;
 use App\Http\Controllers\Api\V1\RepaymentController;
 use App\Http\Controllers\Api\V1\ReportController;
+use App\Http\Controllers\Api\V1\UserController;
 use App\Support\Permissions;
 use Illuminate\Support\Facades\Route;
 
@@ -167,6 +168,25 @@ Route::prefix('v1')->group(function (): void {
         Route::post('loans/{application}/repayments/{repayment}/reversal', [RepaymentController::class, 'reverse'])
             ->middleware('permission:'.Permissions::REPAYMENTS_RECORD)
             ->name('repayments.reverse');
+
+        // Staff accounts. Creating one hands out access to client records and
+        // to money, so it sits behind its own permission rather than being
+        // folded in with viewing the list.
+        Route::get('users', [UserController::class, 'index'])
+            ->middleware('permission:'.Permissions::USERS_VIEW)
+            ->name('users.index');
+
+        Route::get('users/roles', [UserController::class, 'roles'])
+            ->middleware('permission:'.Permissions::USERS_VIEW)
+            ->name('users.roles');
+
+        Route::post('users', [UserController::class, 'store'])
+            ->middleware('permission:'.Permissions::USERS_MANAGE)
+            ->name('users.store');
+
+        Route::patch('users/{user}', [UserController::class, 'update'])
+            ->middleware('permission:'.Permissions::USERS_MANAGE)
+            ->name('users.update');
 
         Route::get('reports/portfolio', [ReportController::class, 'portfolio'])
             ->middleware('permission:'.Permissions::REPORTS_VIEW)

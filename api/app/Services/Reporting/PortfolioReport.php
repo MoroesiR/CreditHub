@@ -10,6 +10,7 @@ use App\Enums\LoanApplicationStatus;
 use App\Models\Commission;
 use App\Models\Disbursement;
 use App\Models\LoanApplication;
+use App\Services\Repayments\LoanAccount;
 use Illuminate\Support\Carbon;
 
 /**
@@ -31,6 +32,7 @@ final class PortfolioReport
             'pipeline' => $this->pipeline(),
             'cash_out' => $this->cashOut(),
             'commission' => $this->commission(),
+            'repayments' => $this->repayments(),
             'monthly' => $this->monthly(),
         ];
     }
@@ -102,6 +104,56 @@ final class PortfolioReport
             'owing_total' => (float) Commission::where('status', CommissionStatus::Pending)->sum('amount'),
             'paid_count' => Commission::where('status', CommissionStatus::Paid)->count(),
             'paid_total' => (float) Commission::where('status', CommissionStatus::Paid)->sum('amount'),
+        ];
+    }
+
+    /**
+     * How the book is being repaid.
+     *
+     * Collected is money in. Outstanding is what those loans still owe, and
+     * arrears is the part of it that should already have been paid, which is
+     * the only figure that says whether the book is healthy.
+     *
+     * @return array<string, mixed>
+     */
+    private function repayments(): array
+    {
+        $loans = LoanApplication::query()
+            ->where('status', LoanApplicationStatus::Disbursed)
+            ->with('disbursement')
+            ->get();
+
+        $accounts = new LoanAccount();
+
+        $collected = 0.0;
+        $outstanding = 0.0;
+        $arrears = 0.0;
+        $behind = 0;
+        $settled = 0;
+
+        foreach ($loans as $loan) {
+            $account = $accounts->summarise($loan);
+
+            $collected += $account['paid'];
+            $outstanding += $account['balance'];
+            $arrears += $account['arrears'];
+
+            if ($account['is_in_arrears']) {
+                $behind++;
+            }
+
+            if ($account['is_settled']) {
+                $settled++;
+            }
+        }
+
+        return [
+            'live_loans' => $loans->count(),
+            'collected' => round($collected, 2),
+            'outstanding' => round($outstanding, 2),
+            'arrears' => round($arrears, 2),
+            'accounts_in_arrears' => $behind,
+            'accounts_settled' => $settled,
         ];
     }
 

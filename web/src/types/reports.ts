@@ -28,5 +28,13 @@ export interface PortfolioReport {
     paid_count: number
     paid_total: number
   }
+  repayments: {
+    live_loans: number
+    collected: number
+    outstanding: number
+    arrears: number
+    accounts_in_arrears: number
+    accounts_settled: number
+  }
   monthly: MonthlyRow[]
 }

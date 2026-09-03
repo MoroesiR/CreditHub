@@ -11,6 +11,7 @@ use App\Models\Commission;
 use App\Models\LoanApplication;
 use App\Models\Recruiter;
 use App\Models\User;
+use App\Services\Repayments\LoanAccount;
 use App\Support\Permissions;
 
 /**
@@ -22,6 +23,10 @@ use App\Support\Permissions;
  */
 final class DashboardSummaryService
 {
+    public function __construct(
+        private readonly LoanAccount $accounts,
+    ) {}
+
     /**
      * @return array<int, array{key: string, label: string, value: int|float, caption: string, format: string, href: string}>
      */
@@ -79,6 +84,29 @@ final class DashboardSummaryService
                 'caption' => 'Signed, ready to verify',
                 'format' => 'number',
                 'href' => '/disbursements',
+            ];
+        }
+
+        if ($user->hasPermission(Permissions::REPAYMENTS_VIEW)) {
+            $arrears = 0.0;
+            $behind = 0;
+
+            foreach (LoanApplication::where('status', LoanApplicationStatus::Disbursed)->with('disbursement')->get() as $loan) {
+                $account = $this->accounts->summarise($loan);
+                $arrears += $account['arrears'];
+
+                if ($account['is_in_arrears']) {
+                    $behind++;
+                }
+            }
+
+            $tiles[] = [
+                'key' => 'arrears',
+                'label' => 'In arrears',
+                'value' => round($arrears, 2),
+                'caption' => $behind === 1 ? '1 account behind' : "{$behind} accounts behind",
+                'format' => 'money',
+                'href' => '/repayments',
             ];
         }
 

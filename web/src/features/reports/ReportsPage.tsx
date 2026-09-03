@@ -121,6 +121,52 @@ export function ReportsPage() {
 
       <section className="rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+          Coming back in
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Arrears is the part of the outstanding balance that should already have been paid. It is
+          the figure that says whether the book is healthy, rather than merely large.
+        </p>
+
+        <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt className="text-sm text-slate-500">Collected</dt>
+            <dd className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+              {formatMoney(data.repayments.collected)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-slate-500">Still outstanding</dt>
+            <dd className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+              {formatMoney(data.repayments.outstanding)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-slate-500">In arrears</dt>
+            <dd
+              className={`mt-1 text-2xl font-semibold tracking-tight ${
+                data.repayments.arrears > 0 ? 'text-red-700' : 'text-emerald-700'
+              }`}
+            >
+              {formatMoney(data.repayments.arrears)}
+            </dd>
+            <dd className="text-xs text-slate-500">
+              {formatNumber(data.repayments.accounts_in_arrears)} of{' '}
+              {formatNumber(data.repayments.live_loans)} accounts behind
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-slate-500">Settled</dt>
+            <dd className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+              {formatNumber(data.repayments.accounts_settled)}
+            </dd>
+            <dd className="text-xs text-slate-500">loans paid off in full</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
           Paid out by month
         </h2>
 
