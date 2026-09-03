@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { Spinner } from '@/components/Spinner'
+import { JourneyTimeline } from '@/features/applications/JourneyTimeline'
 import { StatusBadge } from '@/features/applications/StatusBadge'
 import {
   decideApplication,
@@ -191,6 +192,19 @@ export function ApplicationDetailPage() {
           )}
         </div>
       </section>
+
+      {application.journey && application.journey.length > 0 && (
+        <section className="rounded-lg border border-slate-200 bg-white p-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            Where this file has been
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Each stage is held by a different person on purpose, so no single
+            desk can carry a loan from capture to payment.
+          </p>
+          <JourneyTimeline stages={application.journey} />
+        </section>
+      )}
 
       <section className="rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">

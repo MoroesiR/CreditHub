@@ -32,8 +32,18 @@ final class Roles
         return [
             self::ADMIN => [
                 'name' => 'System Administrator',
-                'description' => 'Full access, including staff accounts and role assignment.',
-                'permissions' => Permissions::all(),
+                'description' => 'Oversight of the whole book, plus staff accounts and role assignment. Does not move money.',
+                // Everything except releasing funds. An administrator can see
+                // every payout and every commission, and can hand the job to
+                // somebody by assigning the role, but cannot pay one out
+                // themselves. Holding both the ability to grant permissions and
+                // the ability to release money is the one combination that
+                // leaves nothing for anyone else to check.
+                'permissions' => array_values(array_diff(Permissions::all(), [
+                    Permissions::DISBURSEMENTS_VERIFY,
+                    Permissions::DISBURSEMENTS_PAY,
+                    Permissions::COMMISSIONS_PAY,
+                ])),
             ],
 
             self::LOAN_OFFICER => [

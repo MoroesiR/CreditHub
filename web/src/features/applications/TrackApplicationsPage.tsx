@@ -113,7 +113,7 @@ export function TrackApplicationsPage() {
                   <th className="px-4 py-3 font-medium">Client</th>
                   <th className="px-4 py-3 text-right font-medium">Amount</th>
                   <th className="px-4 py-3 text-right font-medium">Instalment</th>
-                  <th className="px-4 py-3 font-medium">Submitted</th>
+                  <th className="px-4 py-3 font-medium">Handled by</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
               </thead>
@@ -145,8 +145,29 @@ export function TrackApplicationsPage() {
                     <td className="px-4 py-3 text-right text-slate-700">
                       {formatMoney(application.monthly_instalment)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {formatDate(application.submitted_at)}
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const done = (application.journey ?? []).filter((stage) => stage.done)
+                        const last = done[done.length - 1]
+                        const next = (application.journey ?? []).find((stage) => !stage.done)
+
+                        if (!last) {
+                          return <span className="text-slate-400">Not submitted</span>
+                        }
+
+                        return (
+                          <>
+                            <p className="text-slate-900">{last.actor ?? 'Unrecorded'}</p>
+                            <p className="text-xs text-slate-500">
+                              {last.label}
+                              {last.at ? ` · ${formatDate(last.at)}` : ''}
+                            </p>
+                            {next && (
+                              <p className="text-xs text-amber-700">Next: {next.label}</p>
+                            )}
+                          </>
+                        )
+                      })()}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge

@@ -35,7 +35,17 @@ final class LoanApplicationController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $applications = LoanApplication::query()
-            ->with(['client', 'recruiter'])
+            ->with([
+                'client',
+                'recruiter',
+                'submittedBy',
+                'decidedBy',
+                'agreement.witnessedBy',
+                'disbursement.verifiedBy',
+                'disbursement.paidBy',
+                'commission.recruiter',
+                'commission.paidBy',
+            ])
             ->when(
                 $request->filled('status'),
                 fn ($query) => $query->where('status', $request->string('status')->value()),
@@ -94,7 +104,16 @@ final class LoanApplicationController extends Controller
     {
         return new LoanApplicationResource(
             $application->load([
-                'client.recruiter', 'recruiter', 'submittedBy', 'decidedBy', 'documents',
+                'client.recruiter',
+                'recruiter',
+                'submittedBy',
+                'decidedBy',
+                'documents',
+                'agreement.witnessedBy',
+                'disbursement.verifiedBy',
+                'disbursement.paidBy',
+                'commission.recruiter',
+                'commission.paidBy',
             ]),
         );
     }

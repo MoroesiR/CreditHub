@@ -21,6 +21,15 @@ export interface ApplicationDocument {
   uploaded_at: string | null
 }
 
+export interface JourneyStage {
+  key: string
+  label: string
+  actor: string | null
+  at: string | null
+  done: boolean
+  detail: string | null
+}
+
 export interface LoanApplication {
   id: number
   application_number: string
@@ -39,6 +48,7 @@ export interface LoanApplication {
   decided_by?: string | null
   decline_reason: string | null
   documents?: ApplicationDocument[]
+  journey?: JourneyStage[]
   client?: Client
   recruiter?: Recruiter
   created_at: string | null

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\LoanApplication;
+use App\Services\Loans\ApplicationJourney;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -40,6 +41,14 @@ class LoanApplicationResource extends JsonResource
             'decline_reason' => $this->decline_reason,
 
             'documents' => ApplicationDocumentResource::collection($this->whenLoaded('documents')),
+
+            // Whose hands the file has passed through. Built only when the
+            // caller has loaded what it needs, so a list of fifty applications
+            // does not turn into a few hundred queries.
+            'journey' => $this->when(
+                $this->relationLoaded('submittedBy'),
+                fn () => app(ApplicationJourney::class)->for($this->resource),
+            ),
 
             'client' => new ClientResource($this->whenLoaded('client')),
             'recruiter' => new RecruiterResource($this->whenLoaded('recruiter')),

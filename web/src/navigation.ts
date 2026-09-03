@@ -43,6 +43,7 @@ export const MODULES: Module[] = [
         path: '/clients/register',
         label: 'Register client',
         permission: 'clients.create',
+        primaryFor: ['loan-officer'],
         summary: 'Capture a new borrower, their affordability, and the recruiter who introduced them.',
       },
       {
