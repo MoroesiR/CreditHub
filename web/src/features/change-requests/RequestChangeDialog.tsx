@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { submitChangeRequest } from '@/features/change-requests/api'
+import { fetchBanks, fetchLocations } from '@/features/clients/api'
 import { errorMessage } from '@/lib/api'
 
 export interface EditableField {
@@ -40,6 +41,21 @@ export function RequestChangeDialog({
   onClose: () => void
 }) {
   const queryClient = useQueryClient()
+
+  // The same lists registration uses, served by the API so a name chosen here
+  // is one the validator will accept.
+  const { data: banks } = useQuery({
+    queryKey: ['reference', 'banks'],
+    queryFn: fetchBanks,
+    staleTime: Infinity,
+  })
+
+  const { data: locations } = useQuery({
+    queryKey: ['reference', 'locations'],
+    queryFn: fetchLocations,
+    staleTime: Infinity,
+  })
+
   const [values, setValues] = useState<Record<string, string>>({})
   const [reason, setReason] = useState('')
   const [reviewing, setReviewing] = useState(false)
@@ -57,6 +73,27 @@ export function RequestChangeDialog({
   const payload: Record<string, string> = Object.fromEntries(
     changed.map((field) => [field.name, values[field.name] ?? '']),
   )
+
+  const optionsFor = (field: EditableField): EditableField['options'] => {
+    if (field.options) {
+      return field.options
+    }
+
+    if (field.name === 'bank_name') {
+      return banks?.map((bank) => ({ value: bank.name, label: bank.name }))
+    }
+
+    if (field.name === 'province') {
+      return locations?.provinces.map((province) => ({ value: province, label: province }))
+    }
+
+    return undefined
+  }
+
+  // Shown under the bank so the officer can see what the branch code will
+  // become. The server derives it again on approval; this is only a preview.
+  const chosenBank = values.bank_name
+  const branchCode = banks?.find((bank) => bank.name === chosenBank)?.branch_code ?? null
 
   const groups = [...new Set(fields.map((field) => field.group))]
 
@@ -139,6 +176,13 @@ export function RequestChangeDialog({
               ))}
             </dl>
 
+            {chosenBank && branchCode && (
+              <p className="mt-2 text-xs text-slate-500">
+                The branch code follows from the bank and becomes {branchCode}. It is set by the
+                system, not typed.
+              </p>
+            )}
+
             <p className="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
               <span className="font-medium text-slate-700">Reason given: </span>
               {reason}
@@ -189,7 +233,7 @@ export function RequestChangeDialog({
                           <span className="mt-0.5 block text-xs text-slate-400">
                             Now: {field.current || 'not captured'}
                           </span>
-                          {field.options ? (
+                          {optionsFor(field) ? (
                             <select
                               value={values[field.name] ?? ''}
                               onChange={(event) =>
@@ -201,7 +245,7 @@ export function RequestChangeDialog({
                               className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
                             >
                               <option value="">Leave unchanged</option>
-                              {field.options.map((option) => (
+                              {optionsFor(field)?.map((option) => (
                                 <option key={option.value} value={option.value}>
                                   {option.label}
                                 </option>
@@ -219,6 +263,12 @@ export function RequestChangeDialog({
                               placeholder="Leave blank to keep"
                               className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
                             />
+                          )}
+
+                          {field.name === 'bank_name' && chosenBank && (
+                            <span className="mt-1 block text-xs text-slate-500">
+                              Branch code becomes {branchCode ?? 'unknown'}
+                            </span>
                           )}
                         </label>
                       ))}

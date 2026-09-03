@@ -16,6 +16,7 @@ use App\Services\Notifications\NotificationAudience;
 use App\Support\IdentityNumber;
 use App\Support\Permissions;
 use App\Support\SouthAfricanBanks;
+use App\Support\SouthAfricanProvinces;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -87,6 +88,8 @@ final class ChangeRequestService
         if ($changes === []) {
             throw new RuntimeException('Nothing on this record would change.');
         }
+
+        $this->assertClosedListsHold($changes);
 
         // One outstanding request per record. Two pending edits to the same
         // bank account would leave an administrator approving them in
@@ -260,6 +263,30 @@ final class ChangeRequestService
 
             return $request->fresh();
         });
+    }
+
+    /**
+     * A bank and a province are closed lists at registration, and a change
+     * request must not be the way round that. Checked when the request is
+     * raised rather than when it is approved, so the officer is told at once
+     * instead of an administrator finding out later.
+     *
+     * @param  array<string, mixed>  $changes
+     */
+    private function assertClosedListsHold(array $changes): void
+    {
+        $bank = $changes['bank_name'] ?? null;
+
+        if ($bank !== null && $bank !== '' && SouthAfricanBanks::branchCodeFor((string) $bank) === null) {
+            throw new RuntimeException('That is not a bank on the list.');
+        }
+
+        $province = $changes['province'] ?? null;
+
+        if ($province !== null && $province !== ''
+            && ! in_array((string) $province, SouthAfricanProvinces::all(), strict: true)) {
+            throw new RuntimeException('That is not one of the nine provinces.');
+        }
     }
 
     private function assertPending(ChangeRequest $request): void
