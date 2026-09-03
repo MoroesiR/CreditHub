@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
             ['Sipho', 'Dlamini', 'officer@credithub.test', 'Loan Officer', Roles::LOAN_OFFICER],
             ['Naledi', 'Khumalo', 'credit@credithub.test', 'Credit Manager', Roles::CREDIT_MANAGER],
             ['Kagiso', 'Pillay', 'payouts@credithub.test', 'Disbursement Officer', Roles::DISBURSEMENT_OFFICER],
+            ['Lebo', 'Mahlangu', 'collections@credithub.test', 'Collections Officer', Roles::COLLECTIONS_OFFICER],
             ['Fatima', 'Adams', 'auditor@credithub.test', 'Internal Auditor', Roles::AUDITOR],
         ];
 

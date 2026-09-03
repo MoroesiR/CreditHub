@@ -8,6 +8,8 @@ import { ClientSearchPage } from '@/features/clients/ClientSearchPage'
 import { AgreementPage } from '@/features/agreements/AgreementPage'
 import { CommissionsPage } from '@/features/commissions/CommissionsPage'
 import { DisbursementQueuePage } from '@/features/disbursements/DisbursementQueuePage'
+import { RepaymentsPage } from '@/features/repayments/RepaymentsPage'
+import { ReportsPage } from '@/features/reports/ReportsPage'
 import { ApplicationDetailPage } from '@/features/applications/ApplicationDetailPage'
 import { CreateApplicationPage } from '@/features/applications/CreateApplicationPage'
 import { TrackApplicationsPage } from '@/features/applications/TrackApplicationsPage'
@@ -27,6 +29,8 @@ const BUILT = new Set([
   '/applications',
   '/disbursements',
   '/commissions',
+  '/reports',
+  '/repayments',
 ])
 
 export function App() {
@@ -126,6 +130,23 @@ export function App() {
             element={
               <RequirePermission permission="commissions.view">
                 <CommissionsPage />
+              </RequirePermission>
+            }
+          />
+
+          <Route
+            path="/repayments"
+            element={
+              <RequirePermission permission="repayments.view">
+                <RepaymentsPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <RequirePermission permission="reports.view">
+                <ReportsPage />
               </RequirePermission>
             }
           />

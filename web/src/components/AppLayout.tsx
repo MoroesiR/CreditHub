@@ -17,9 +17,17 @@ export function AppLayout() {
     void navigate('/login', { replace: true })
   }
 
-  // A module is shown when the role may view it; its dropdown then lists only
-  // the entries the role may actually reach.
-  const modules = MODULES.filter((module) => can(module.permission)).map((module) => ({
+  const roles = user?.roles.map((role) => role.slug) ?? []
+
+  // Two filters, and they answer different questions. Permission decides what
+  // a role may open at all; primaryFor decides what it works in often enough
+  // to deserve a place in the header. A payouts officer can still open a
+  // client from a link on a payout, without carrying a Clients menu item.
+  const modules = MODULES.filter(
+    (module) =>
+      can(module.permission) &&
+      (module.primaryFor === undefined || module.primaryFor.some((slug) => roles.includes(slug))),
+  ).map((module) => ({
     ...module,
     children: module.children?.filter((child) => can(child.permission)) ?? [],
   }))

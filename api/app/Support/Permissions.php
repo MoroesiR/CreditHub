@@ -49,6 +49,9 @@ final class Permissions
 
     public const DISBURSEMENTS_PAY = 'disbursements.pay';
 
+    public const REPAYMENTS_VIEW = 'repayments.view';
+    public const REPAYMENTS_RECORD = 'repayments.record';
+
     public const COMMISSIONS_VIEW = 'commissions.view';
 
     public const COMMISSIONS_PAY = 'commissions.pay';
@@ -90,6 +93,9 @@ final class Permissions
             self::DISBURSEMENTS_VIEW => ['name' => 'View the disbursement queue', 'group' => 'disbursements'],
             self::DISBURSEMENTS_VERIFY => ['name' => 'Verify payout instructions', 'group' => 'disbursements'],
             self::DISBURSEMENTS_PAY => ['name' => 'Release loan payments', 'group' => 'disbursements'],
+
+            self::REPAYMENTS_VIEW => ['name' => 'View loan accounts and repayments', 'group' => 'repayments'],
+            self::REPAYMENTS_RECORD => ['name' => 'Record repayments received', 'group' => 'repayments'],
 
             self::COMMISSIONS_VIEW => ['name' => 'View recruiter commissions', 'group' => 'commissions'],
             self::COMMISSIONS_PAY => ['name' => 'Release commission payments', 'group' => 'commissions'],

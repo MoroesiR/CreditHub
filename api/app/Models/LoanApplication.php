@@ -96,6 +96,14 @@ class LoanApplication extends Model
     }
 
     /**
+     * @return HasMany<LoanRepayment, $this>
+     */
+    public function repayments(): HasMany
+    {
+        return $this->hasMany(LoanRepayment::class)->orderByDesc('received_on');
+    }
+
+    /**
      * @return HasOne<Disbursement, $this>
      */
     public function disbursement(): HasOne

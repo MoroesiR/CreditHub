@@ -19,11 +19,19 @@ export interface Module {
   permission: string
   summary: string
   children?: ModuleChild[]
+  /**
+   * Roles that work in this module day to day, and so get it in the header.
+   * Everyone else keeps the permission and reaches the same screens by
+   * following a link, they just do not carry a menu item they never use.
+   * Omit to show the module to anyone holding the permission.
+   */
+  primaryFor?: string[]
 }
 
 export const MODULES: Module[] = [
   {
     path: '/clients',
+    primaryFor: ['admin', 'loan-officer'],
     label: 'Clients',
     permission: 'clients.view',
     summary:
@@ -45,6 +53,7 @@ export const MODULES: Module[] = [
   },
   {
     path: '/recruiters',
+    primaryFor: ['admin', 'loan-officer'],
     label: 'Recruiters',
     permission: 'recruiters.view',
     summary:
@@ -66,6 +75,7 @@ export const MODULES: Module[] = [
   },
   {
     path: '/applications',
+    primaryFor: ['admin', 'loan-officer', 'credit-manager', 'auditor'],
     label: 'Applications',
     permission: 'applications.view',
     summary:
@@ -87,6 +97,7 @@ export const MODULES: Module[] = [
   },
   {
     path: '/agreements',
+    primaryFor: ['admin'],
     label: 'Agreements',
     permission: 'agreements.view',
     summary:
@@ -94,13 +105,23 @@ export const MODULES: Module[] = [
   },
   {
     path: '/disbursements',
+    primaryFor: ['admin', 'disbursement-officer', 'auditor'],
     label: 'Disbursements',
     permission: 'disbursements.view',
     summary:
       'The payout queue. Verify that a loan is approved and signed, then release the funds to the client.',
   },
   {
+    path: '/repayments',
+    primaryFor: ['admin', 'collections-officer', 'credit-manager', 'auditor'],
+    label: 'Repayments',
+    permission: 'repayments.view',
+    summary:
+      'Loans with money out against them, what has been received back, and which accounts are behind.',
+  },
+  {
     path: '/commissions',
+    primaryFor: ['admin', 'disbursement-officer', 'auditor'],
     label: 'Commissions',
     permission: 'commissions.view',
     summary:
@@ -108,12 +129,14 @@ export const MODULES: Module[] = [
   },
   {
     path: '/reports',
+    primaryFor: ['admin', 'credit-manager', 'auditor'],
     label: 'Reports',
     permission: 'reports.view',
     summary: 'Book performance, decision turnaround, and commission exposure.',
   },
   {
     path: '/users',
+    primaryFor: ['admin'],
     label: 'Users',
     permission: 'users.view',
     summary: 'Staff accounts and the roles assigned to them.',

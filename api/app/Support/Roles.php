@@ -21,6 +21,7 @@ final class Roles
 
     public const DISBURSEMENT_OFFICER = 'disbursement-officer';
 
+    public const COLLECTIONS_OFFICER = 'collections-officer';
     public const AUDITOR = 'auditor';
 
     /**
@@ -54,6 +55,7 @@ final class Roles
                     Permissions::AGREEMENTS_GENERATE,
                     Permissions::AGREEMENTS_SIGN,
                     Permissions::COMMISSIONS_VIEW,
+                    Permissions::REPAYMENTS_VIEW,
                 ],
             ],
 
@@ -68,6 +70,7 @@ final class Roles
                     Permissions::APPLICATIONS_DECIDE,
                     Permissions::AGREEMENTS_VIEW,
                     Permissions::COMMISSIONS_VIEW,
+                    Permissions::REPAYMENTS_VIEW,
                     Permissions::REPORTS_VIEW,
                 ],
             ],
@@ -85,6 +88,18 @@ final class Roles
                     Permissions::DISBURSEMENTS_PAY,
                     Permissions::COMMISSIONS_VIEW,
                     Permissions::COMMISSIONS_PAY,
+                    Permissions::REPAYMENTS_VIEW,
+                ],
+            ],
+
+            self::COLLECTIONS_OFFICER => [
+                'name' => 'Collections Officer',
+                'description' => 'Receipts repayments against disbursed loans. Cannot originate, approve or pay anything out.',
+                'permissions' => [
+                    Permissions::CLIENTS_VIEW,
+                    Permissions::APPLICATIONS_VIEW,
+                    Permissions::REPAYMENTS_VIEW,
+                    Permissions::REPAYMENTS_RECORD,
                 ],
             ],
 

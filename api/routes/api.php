@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\V1\LoanApplicationController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\RecruiterController;
 use App\Http\Controllers\Api\V1\ReferenceController;
+use App\Http\Controllers\Api\V1\RepaymentController;
+use App\Http\Controllers\Api\V1\ReportController;
 use App\Support\Permissions;
 use Illuminate\Support\Facades\Route;
 
@@ -146,6 +148,29 @@ Route::prefix('v1')->group(function (): void {
         Route::post('disbursements/{disbursement}/payment', [DisbursementController::class, 'pay'])
             ->middleware('permission:'.Permissions::DISBURSEMENTS_PAY)
             ->name('disbursements.pay');
+
+        // Money coming back in. Receipting is held by a desk that cannot pay
+        // anything out, so one person cannot cover a missing payout with a
+        // receipt that was never received.
+        Route::get('loans', [RepaymentController::class, 'loans'])
+            ->middleware('permission:'.Permissions::REPAYMENTS_VIEW)
+            ->name('loans.index');
+
+        Route::get('loans/{application}/repayments', [RepaymentController::class, 'index'])
+            ->middleware('permission:'.Permissions::REPAYMENTS_VIEW)
+            ->name('repayments.index');
+
+        Route::post('loans/{application}/repayments', [RepaymentController::class, 'store'])
+            ->middleware('permission:'.Permissions::REPAYMENTS_RECORD)
+            ->name('repayments.store');
+
+        Route::post('loans/{application}/repayments/{repayment}/reversal', [RepaymentController::class, 'reverse'])
+            ->middleware('permission:'.Permissions::REPAYMENTS_RECORD)
+            ->name('repayments.reverse');
+
+        Route::get('reports/portfolio', [ReportController::class, 'portfolio'])
+            ->middleware('permission:'.Permissions::REPORTS_VIEW)
+            ->name('reports.portfolio');
 
         Route::get('commissions', [CommissionController::class, 'index'])
             ->middleware('permission:'.Permissions::COMMISSIONS_VIEW)
