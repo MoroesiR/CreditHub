@@ -6,8 +6,8 @@ import { Spinner } from '@/components/Spinner'
 import { StatusBadge } from '@/features/applications/StatusBadge'
 import { searchApplications } from '@/features/applications/api'
 import { useAuth } from '@/features/auth/useAuth'
-import { formatDate, formatMoney } from '@/lib/format'
-import type { ApplicationStatus } from '@/types/applications'
+import { formatDateTime, formatMoney } from '@/lib/format'
+import type { ApplicationStatus, JourneyStage } from '@/types/applications'
 
 const FILTERS: { value: ApplicationStatus | ''; label: string }[] = [
   { value: '', label: 'All' },
@@ -17,6 +17,48 @@ const FILTERS: { value: ApplicationStatus | ''; label: string }[] = [
   { value: 'agreement_signed', label: 'Agreement signed' },
   { value: 'disbursed', label: 'Disbursed' },
 ]
+
+/**
+ * One custody point: who did it and when, or why it has not happened yet.
+ *
+ * Read off the same journey the detail page uses, so a name in this table and
+ * a name on the file can never disagree.
+ */
+function StageCell({
+  journey,
+  stageKey,
+}: {
+  journey?: JourneyStage[]
+  stageKey: 'captured' | 'decision' | 'agreement' | 'paid'
+}) {
+  const stage = journey?.find((entry) => entry.key === stageKey)
+
+  if (!stage) {
+    // Declined files stop after the decision, and walk-ins never reach a
+    // commission stage, so a missing stage means "not on this file's route".
+    return (
+      <td className="px-4 py-3 text-slate-300" title="Not part of this file's route">
+        n/a
+      </td>
+    )
+  }
+
+  if (!stage.done) {
+    return (
+      <td className="px-4 py-3">
+        <span className="text-xs text-amber-700">Pending</span>
+      </td>
+    )
+  }
+
+  return (
+    <td className="px-4 py-3">
+      <p className="text-slate-900">{stage.actor ?? 'Unrecorded'}</p>
+      <p className="text-xs text-slate-500">{stage.at ? formatDateTime(stage.at) : ''}</p>
+      {stage.detail && <p className="text-xs text-slate-400">{stage.detail}</p>}
+    </td>
+  )
+}
 
 export function TrackApplicationsPage() {
   const { can } = useAuth()
@@ -113,7 +155,10 @@ export function TrackApplicationsPage() {
                   <th className="px-4 py-3 font-medium">Client</th>
                   <th className="px-4 py-3 text-right font-medium">Amount</th>
                   <th className="px-4 py-3 text-right font-medium">Instalment</th>
-                  <th className="px-4 py-3 font-medium">Handled by</th>
+                  <th className="px-4 py-3 font-medium">Captured by</th>
+                  <th className="px-4 py-3 font-medium">Decision</th>
+                  <th className="px-4 py-3 font-medium">Agreement signed</th>
+                  <th className="px-4 py-3 font-medium">Paid out</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
               </thead>
@@ -145,30 +190,10 @@ export function TrackApplicationsPage() {
                     <td className="px-4 py-3 text-right text-slate-700">
                       {formatMoney(application.monthly_instalment)}
                     </td>
-                    <td className="px-4 py-3">
-                      {(() => {
-                        const done = (application.journey ?? []).filter((stage) => stage.done)
-                        const last = done[done.length - 1]
-                        const next = (application.journey ?? []).find((stage) => !stage.done)
-
-                        if (!last) {
-                          return <span className="text-slate-400">Not submitted</span>
-                        }
-
-                        return (
-                          <>
-                            <p className="text-slate-900">{last.actor ?? 'Unrecorded'}</p>
-                            <p className="text-xs text-slate-500">
-                              {last.label}
-                              {last.at ? ` · ${formatDate(last.at)}` : ''}
-                            </p>
-                            {next && (
-                              <p className="text-xs text-amber-700">Next: {next.label}</p>
-                            )}
-                          </>
-                        )
-                      })()}
-                    </td>
+                    <StageCell journey={application.journey} stageKey="captured" />
+                    <StageCell journey={application.journey} stageKey="decision" />
+                    <StageCell journey={application.journey} stageKey="agreement" />
+                    <StageCell journey={application.journey} stageKey="paid" />
                     <td className="px-4 py-3">
                       <StatusBadge
                         status={application.status}

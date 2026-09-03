@@ -66,6 +66,10 @@ final class Roles
                     Permissions::AGREEMENTS_SIGN,
                     Permissions::COMMISSIONS_VIEW,
                     Permissions::REPAYMENTS_VIEW,
+                    // May ask for a client or recruiter to be corrected, but
+                    // not carry out the correction.
+                    Permissions::CHANGE_REQUESTS_VIEW,
+                    Permissions::CHANGE_REQUESTS_CREATE,
                 ],
             ],
 

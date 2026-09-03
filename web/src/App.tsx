@@ -6,6 +6,7 @@ import { RequirePermission } from '@/components/RequirePermission'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { ClientSearchPage } from '@/features/clients/ClientSearchPage'
 import { AgreementPage } from '@/features/agreements/AgreementPage'
+import { ChangeRequestsPage } from '@/features/change-requests/ChangeRequestsPage'
 import { CommissionsPage } from '@/features/commissions/CommissionsPage'
 import { DisbursementQueuePage } from '@/features/disbursements/DisbursementQueuePage'
 import { RepaymentsPage } from '@/features/repayments/RepaymentsPage'
@@ -34,6 +35,7 @@ const BUILT = new Set([
   '/reports',
   '/repayments',
   '/users',
+  '/change-requests',
 ])
 
 export function App() {
@@ -133,6 +135,14 @@ export function App() {
             element={
               <RequirePermission permission="disbursements.view">
                 <DisbursementQueuePage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="/change-requests"
+            element={
+              <RequirePermission permission="change-requests.view">
+                <ChangeRequestsPage />
               </RequirePermission>
             }
           />

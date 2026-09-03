@@ -62,6 +62,10 @@ final class Permissions
 
     public const REPORTS_VIEW = 'reports.view';
 
+    public const CHANGE_REQUESTS_VIEW = 'change-requests.view';
+    public const CHANGE_REQUESTS_CREATE = 'change-requests.create';
+    public const CHANGE_REQUESTS_REVIEW = 'change-requests.review';
+
     /**
      * Every permission, as slug => [name, group].
      *
@@ -104,6 +108,10 @@ final class Permissions
             self::USERS_MANAGE => ['name' => 'Manage staff accounts and roles', 'group' => 'users'],
 
             self::REPORTS_VIEW => ['name' => 'View reports', 'group' => 'reports'],
+
+            self::CHANGE_REQUESTS_VIEW => ['name' => 'View change requests', 'group' => 'change-requests'],
+            self::CHANGE_REQUESTS_CREATE => ['name' => 'Request a change to a client or recruiter', 'group' => 'change-requests'],
+            self::CHANGE_REQUESTS_REVIEW => ['name' => 'Approve or reject change requests', 'group' => 'change-requests'],
         ];
     }
 

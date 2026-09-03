@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { DocumentModal } from '@/components/DocumentModal'
+import { RequestChangeDialog } from '@/features/change-requests/RequestChangeDialog'
 import { Spinner } from '@/components/Spinner'
 import { StatusBadge } from '@/features/applications/StatusBadge'
+import { useAuth } from '@/features/auth/useAuth'
 import { fetchClientProfile } from '@/features/clients/api'
 import { api } from '@/lib/api'
 import { formatDate, formatMoney } from '@/lib/format'
@@ -86,10 +88,19 @@ function Detail({ label, value }: { label: string; value: string | null | undefi
   )
 }
 
+const EMPLOYMENT_OPTIONS = [
+  { value: 'permanent', label: 'Permanent' },
+  { value: 'contract', label: 'Contract' },
+  { value: 'self_employed', label: 'Self-employed' },
+  { value: 'pensioner', label: 'Pensioner' },
+]
+
 export function ClientProfilePage() {
   const { id } = useParams<{ id: string }>()
   const clientId = Number(id)
   const [viewing, setViewing] = useState<ProfileDocument | null>(null)
+  const [requestingChange, setRequestingChange] = useState(false)
+  const { can } = useAuth()
 
   const { data, isPending, isError } = useQuery({
     queryKey: ['clients', clientId, 'profile'],
@@ -146,6 +157,16 @@ export function ClientProfilePage() {
               ? `Photograph taken at signing on ${formatDate(photo.captured_at)}`
               : 'No photograph on file. One is captured when an agreement is signed.'}
           </p>
+
+          {can('change-requests.create') && (
+            <button
+              type="button"
+              onClick={() => setRequestingChange(true)}
+              className="mt-3 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              Request a change
+            </button>
+          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -365,6 +386,37 @@ export function ClientProfilePage() {
           </ul>
         )}
       </section>
+
+      {requestingChange && (
+        <RequestChangeDialog
+          subjectKind="client"
+          subjectId={client.id}
+          subjectLabel={`${client.full_name} (${client.client_number})`}
+          onClose={() => setRequestingChange(false)}
+          fields={[
+            { name: 'first_name', label: 'First name', current: client.first_name },
+            { name: 'last_name', label: 'Last name', current: client.last_name },
+            { name: 'id_number', label: 'ID number', current: client.id_number },
+            { name: 'phone', label: 'Phone', current: client.phone },
+            { name: 'email', label: 'Email', current: client.email },
+            { name: 'city', label: 'City', current: client.city },
+            { name: 'province', label: 'Province', current: client.province },
+            { name: 'employer_name', label: 'Employer', current: client.employer_name },
+            {
+              name: 'employment_status',
+              label: 'Employment status',
+              current: client.employment_status,
+              options: EMPLOYMENT_OPTIONS,
+            },
+            { name: 'bank_name', label: 'Bank', current: client.bank_name },
+            {
+              name: 'bank_account_number',
+              label: 'Account number',
+              current: client.bank_account_number,
+            },
+          ]}
+        />
+      )}
 
       {viewing && (
         <DocumentModal

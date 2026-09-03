@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AgreementController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\ChangeRequestController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\CommissionController;
 use App\Http\Controllers\Api\V1\DashboardController;
@@ -50,6 +51,25 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('reference/provinces', [ReferenceController::class, 'provinces'])
             ->name('reference.provinces');
+
+        // Corrections to a client or recruiter are asked for here and decided
+        // by an administrator. There is no direct edit endpoint for either
+        // record: both decide where money goes.
+        Route::get('change-requests', [ChangeRequestController::class, 'index'])
+            ->middleware('permission:'.Permissions::CHANGE_REQUESTS_VIEW)
+            ->name('change-requests.index');
+
+        Route::post('change-requests', [ChangeRequestController::class, 'store'])
+            ->middleware('permission:'.Permissions::CHANGE_REQUESTS_CREATE)
+            ->name('change-requests.store');
+
+        Route::post('change-requests/{changeRequest}/approval', [ChangeRequestController::class, 'approve'])
+            ->middleware('permission:'.Permissions::CHANGE_REQUESTS_REVIEW)
+            ->name('change-requests.approve');
+
+        Route::post('change-requests/{changeRequest}/rejection', [ChangeRequestController::class, 'reject'])
+            ->middleware('permission:'.Permissions::CHANGE_REQUESTS_REVIEW)
+            ->name('change-requests.reject');
 
         Route::get('clients', [ClientController::class, 'index'])
             ->middleware('permission:'.Permissions::CLIENTS_VIEW)

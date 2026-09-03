@@ -21,3 +21,14 @@ export function formatDate(value: string | null): string {
 
   return new Intl.DateTimeFormat('en-ZA', { dateStyle: 'medium' }).format(new Date(value))
 }
+
+export function formatDateTime(value: string | null): string {
+  if (!value) {
+    return '-'
+  }
+
+  return new Intl.DateTimeFormat('en-ZA', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}

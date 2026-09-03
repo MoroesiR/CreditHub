@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 
 import { Spinner } from '@/components/Spinner'
 import { useAuth } from '@/features/auth/useAuth'
+import { RequestChangeDialog } from '@/features/change-requests/RequestChangeDialog'
 import {
   fetchRecruiter,
   fetchRecruiterAuditTrail,
@@ -21,6 +22,7 @@ export function RecruiterDetailPage() {
   const queryClient = useQueryClient()
   const [linkError, setLinkError] = useState<string | null>(null)
   const [justLinked, setJustLinked] = useState<string | null>(null)
+  const [requestingChange, setRequestingChange] = useState(false)
 
   const { data: recruiter, isPending } = useQuery({
     queryKey: ['recruiters', recruiterId],
@@ -86,13 +88,24 @@ export function RecruiterDetailPage() {
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">{recruiter.full_name}</h1>
           <p className="mt-1 font-mono text-sm text-slate-500">{recruiter.recruiter_number}</p>
         </div>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
-            recruiter.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
-          }`}
-        >
-          {recruiter.is_active ? 'Active' : 'Inactive'}
-        </span>
+        <div className="flex items-center gap-3">
+          {can('change-requests.create') && (
+            <button
+              type="button"
+              onClick={() => setRequestingChange(true)}
+              className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              Request a change
+            </button>
+          )}
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-medium ${
+              recruiter.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
+            }`}
+          >
+            {recruiter.is_active ? 'Active' : 'Inactive'}
+          </span>
+        </div>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-3">
@@ -242,6 +255,27 @@ export function RecruiterDetailPage() {
           </ol>
         )}
       </section>
+      {requestingChange && (
+        <RequestChangeDialog
+          subjectKind="recruiter"
+          subjectId={recruiter.id}
+          subjectLabel={`${recruiter.full_name} (${recruiter.recruiter_number})`}
+          onClose={() => setRequestingChange(false)}
+          fields={[
+            { name: 'first_name', label: 'First name', current: recruiter.first_name },
+            { name: 'last_name', label: 'Last name', current: recruiter.last_name },
+            { name: 'id_number', label: 'ID number', current: recruiter.id_number },
+            { name: 'phone', label: 'Phone', current: recruiter.phone },
+            { name: 'email', label: 'Email', current: recruiter.email },
+            { name: 'bank_name', label: 'Bank', current: recruiter.bank_name },
+            {
+              name: 'bank_account_number',
+              label: 'Account number',
+              current: recruiter.bank_account_number,
+            },
+          ]}
+        />
+      )}
     </div>
   )
 }

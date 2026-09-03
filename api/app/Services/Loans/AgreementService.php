@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\AgreementReadyForPayout;
 use App\Services\Audit\AuditRecorder;
 use App\Services\Disbursements\DisbursementService;
+use App\Services\Notifications\NotificationAudience;
 use App\Support\Permissions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,6 +28,7 @@ final class AgreementService
     public function __construct(
         private readonly AuditRecorder $audit,
         private readonly DisbursementService $disbursements,
+        private readonly NotificationAudience $audience,
     ) {}
 
     /**
@@ -142,9 +144,13 @@ final class AgreementService
             $this->disbursements->queue($application);
 
             // Whoever has to act next is told, rather than left to notice it.
-            foreach (User::whereHas('roles.permissions', fn ($query) => $query->where('slug', Permissions::DISBURSEMENTS_VIEW))->get() as $officer) {
-                $officer->notify(new AgreementReadyForPayout($application->loadMissing('client')));
-            }
+            // Addressed to the permission to work a payout, not merely to see
+            // one: an auditor and an administrator can both open the queue but
+            // neither works it, so neither is told it has grown.
+            $this->audience->notifyHoldersOf(
+                Permissions::DISBURSEMENTS_VERIFY,
+                new AgreementReadyForPayout($application->loadMissing('client')),
+            );
 
             $this->audit->record(
                 action: 'agreement.signed',

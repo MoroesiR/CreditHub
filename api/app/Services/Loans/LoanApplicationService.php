@@ -9,9 +9,12 @@ use App\Enums\LoanApplicationStatus;
 use App\Models\Client;
 use App\Models\LoanApplication;
 use App\Models\User;
+use App\Notifications\ApplicationAwaitingDecision;
 use App\Notifications\ApplicationDecided;
 use App\Services\Audit\AuditRecorder;
+use App\Services\Notifications\NotificationAudience;
 use App\Services\Reference\ReferenceNumberService;
+use App\Support\Permissions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -23,6 +26,7 @@ final class LoanApplicationService
         private readonly InstalmentCalculator $pricing,
         private readonly ApplicationDocumentStore $documents,
         private readonly AuditRecorder $audit,
+        private readonly NotificationAudience $audience,
     ) {}
 
     /**
@@ -111,6 +115,15 @@ final class LoanApplicationService
                     'documents' => array_keys($documents),
                 ],
                 ipAddress: $ipAddress,
+            );
+
+            // The credit desk is told a file has arrived rather than having to
+            // watch the queue for one. The officer who submitted it is left out:
+            // they were the one who sent it.
+            $this->audience->notifyHoldersOf(
+                Permissions::APPLICATIONS_DECIDE,
+                new ApplicationAwaitingDecision($application->loadMissing('client'), $submittedBy->fullName()),
+                except: $submittedBy,
             );
 
             return $application->load(['client.recruiter', 'recruiter', 'documents']);

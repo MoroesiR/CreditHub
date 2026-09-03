@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 
-import { NavDropdown } from '@/components/NavDropdown'
 import { useAuth } from '@/features/auth/useAuth'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { MODULES } from '@/navigation'
@@ -27,15 +26,7 @@ export function AppLayout() {
     (module) =>
       can(module.permission) &&
       (module.primaryFor === undefined || module.primaryFor.some((slug) => roles.includes(slug))),
-  ).map((module) => ({
-    ...module,
-    children:
-      module.children?.filter(
-        (child) =>
-          can(child.permission) &&
-          (child.primaryFor === undefined || child.primaryFor.some((slug) => roles.includes(slug))),
-      ) ?? [],
-  }))
+  )
 
   return (
     <div className="flex min-h-full flex-col">
@@ -58,25 +49,21 @@ export function AppLayout() {
               Dashboard
             </NavLink>
 
-            {modules.map((module) =>
-              module.children.length > 0 ? (
-                <NavDropdown key={module.path} label={module.label} items={module.children} />
-              ) : (
-                <NavLink
-                  key={module.path}
-                  to={module.path}
-                  className={({ isActive }) =>
-                    `rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-brand-50 text-brand-700'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`
-                  }
-                >
-                  {module.label}
-                </NavLink>
-              ),
-            )}
+            {modules.map((module) => (
+              <NavLink
+                key={module.path}
+                to={module.path}
+                className={({ isActive }) =>
+                  `rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-brand-50 text-brand-700'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`
+                }
+              >
+                {module.label}
+              </NavLink>
+            ))}
           </nav>
 
           <div className="flex items-center gap-3">

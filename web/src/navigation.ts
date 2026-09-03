@@ -2,25 +2,15 @@
  * The module map.
  *
  * One list drives three things: the links in the header, the routes the router
- * registers, and the permission each route is guarded by. A module with
- * `children` renders as a dropdown; each child carries its own permission, so
- * a role that may search clients but not register them sees only the one item.
+ * registers, and the permission each route is guarded by. Each entry is a
+ * single link: clicking it opens the module rather than asking the user to
+ * pick from a menu first.
  */
-export interface ModuleChild {
-  path: string
-  label: string
-  permission: string
-  summary: string
-  /** Same meaning as on a module: whose day to day work this is. */
-  primaryFor?: string[]
-}
-
 export interface Module {
   path: string
   label: string
   permission: string
   summary: string
-  children?: ModuleChild[]
   /**
    * Roles that work in this module day to day, and so get it in the header.
    * Everyone else keeps the permission and reaches the same screens by
@@ -38,21 +28,6 @@ export const MODULES: Module[] = [
     permission: 'clients.view',
     summary:
       'Register borrowers, capture their employment and banking details, and link them to the recruiter who introduced them.',
-    children: [
-      {
-        path: '/clients/register',
-        label: 'Register client',
-        permission: 'clients.create',
-        primaryFor: ['loan-officer'],
-        summary: 'Capture a new borrower, their affordability, and the recruiter who introduced them.',
-      },
-      {
-        path: '/clients',
-        label: 'Search clients',
-        permission: 'clients.view',
-        summary: 'Find a client by name, client number, ID number, phone or email.',
-      },
-    ],
   },
   {
     path: '/recruiters',
@@ -61,21 +36,6 @@ export const MODULES: Module[] = [
     permission: 'recruiters.view',
     summary:
       'Register recruiters and track the clients they introduce and the commission each introduction has earned.',
-    children: [
-      {
-        path: '/recruiters/register',
-        label: 'Register recruiter',
-        permission: 'recruiters.create',
-        primaryFor: ['loan-officer'],
-        summary: 'Capture a recruiter and the account their commission is paid into.',
-      },
-      {
-        path: '/recruiters',
-        label: 'Search recruiters',
-        permission: 'recruiters.view',
-        summary: 'Find a recruiter by name, recruiter number, ID number or phone.',
-      },
-    ],
   },
   {
     path: '/applications',
@@ -84,21 +44,6 @@ export const MODULES: Module[] = [
     permission: 'applications.view',
     summary:
       'Capture loan applications against an affordability assessment, submit them for a decision, and record the outcome.',
-    children: [
-      {
-        path: '/applications/create',
-        label: 'Create loan application',
-        permission: 'applications.create',
-        primaryFor: ['loan-officer'],
-        summary: 'Price a loan against the affordability on file and send it for a decision.',
-      },
-      {
-        path: '/applications',
-        label: 'Track loan applications',
-        permission: 'applications.view',
-        summary: 'Every application and where it has reached.',
-      },
-    ],
   },
   {
     path: '/disbursements',
@@ -130,6 +75,14 @@ export const MODULES: Module[] = [
     label: 'Reports',
     permission: 'reports.view',
     summary: 'Book performance, decision turnaround, and commission exposure.',
+  },
+  {
+    path: '/change-requests',
+    primaryFor: ['admin', 'loan-officer'],
+    label: 'Change requests',
+    permission: 'change-requests.view',
+    summary:
+      'Corrections to a client or recruiter: asked for by an officer, decided by an administrator.',
   },
   {
     path: '/users',
