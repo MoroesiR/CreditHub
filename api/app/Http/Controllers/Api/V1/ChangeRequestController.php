@@ -41,6 +41,18 @@ final class ChangeRequestController extends Controller
                 $request->filled('status'),
                 fn ($query) => $query->where('status', $request->string('status')->value()),
             )
+            // Lets a client or recruiter page show only its own requests, so a
+            // notification can lead straight to the record being questioned.
+            ->when($request->filled('subject_kind'), function ($query) use ($request): void {
+                $query->where(
+                    'subject_type',
+                    $request->string('subject_kind')->value() === 'client' ? Client::class : Recruiter::class,
+                );
+            })
+            ->when(
+                $request->filled('subject_id'),
+                fn ($query) => $query->where('subject_id', $request->integer('subject_id')),
+            )
             ->latest()
             ->paginate($request->integer('per_page', 20))
             ->withQueryString();

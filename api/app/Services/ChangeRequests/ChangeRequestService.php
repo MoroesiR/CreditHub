@@ -88,6 +88,22 @@ final class ChangeRequestService
             throw new RuntimeException('Nothing on this record would change.');
         }
 
+        // One outstanding request per record. Two pending edits to the same
+        // bank account would leave an administrator approving them in
+        // sequence, the second silently overwriting the first, with no way to
+        // tell afterwards which one the officer actually meant.
+        $outstanding = ChangeRequest::query()
+            ->where('subject_type', $subject::class)
+            ->where('subject_id', $subject->getKey())
+            ->where('status', ChangeRequestStatus::Pending)
+            ->exists();
+
+        if ($outstanding) {
+            throw new RuntimeException(
+                'A change to this record is already awaiting a decision. Wait for that one to be decided first.'
+            );
+        }
+
         return DB::transaction(function () use ($subject, $changes, $reason, $requestedBy, $ipAddress): ChangeRequest {
             $request = ChangeRequest::create([
                 'subject_type' => $subject::class,
@@ -117,7 +133,7 @@ final class ChangeRequestService
             // Only the desk that can decide it is told.
             $this->audience->notifyHoldersOf(
                 Permissions::CHANGE_REQUESTS_REVIEW,
-                new ChangeRequestSubmitted($request, $label, $requestedBy->fullName()),
+                new ChangeRequestSubmitted($request, $label, $requestedBy->fullName(), $this->urlFor($subject)),
                 except: $requestedBy,
             );
 
@@ -195,7 +211,7 @@ final class ChangeRequestService
             );
 
             $request->requestedBy?->notify(
-                new ChangeRequestReviewed($request->fresh(), $label, true, $reviewedBy->fullName()),
+                new ChangeRequestReviewed($request->fresh(), $label, true, $reviewedBy->fullName(), $this->urlFor($subject)),
             );
 
             return $request->fresh();
@@ -233,7 +249,13 @@ final class ChangeRequestService
             }
 
             $request->requestedBy?->notify(
-                new ChangeRequestReviewed($request->fresh(), $label, false, $reviewedBy->fullName()),
+                new ChangeRequestReviewed(
+                    $request->fresh(),
+                    $label,
+                    false,
+                    $reviewedBy->fullName(),
+                    $subject === null ? '/change-requests' : $this->urlFor($subject),
+                ),
             );
 
             return $request->fresh();
@@ -247,6 +269,18 @@ final class ChangeRequestService
                 'This request is '.$request->status->label().' and cannot be decided again.'
             );
         }
+    }
+
+    /**
+     * Where the record lives in the browser, so a notification can lead to it.
+     */
+    private function urlFor(Model $subject): string
+    {
+        return match (true) {
+            $subject instanceof Client => '/clients/'.$subject->getKey(),
+            $subject instanceof Recruiter => '/recruiters/'.$subject->getKey(),
+            default => '/change-requests',
+        };
     }
 
     private function labelFor(Model $subject): string

@@ -20,6 +20,7 @@ final class ChangeRequestSubmitted extends Notification
         private readonly ChangeRequest $request,
         private readonly string $subjectLabel,
         private readonly string $requestedBy,
+        private readonly string $subjectUrl,
     ) {}
 
     /**
@@ -46,7 +47,9 @@ final class ChangeRequestSubmitted extends Notification
                 $fields === '' ? 'this record' : $fields,
                 $this->request->reason,
             ),
-            'action_url' => '/change-requests',
+            // Straight to the record, with the request named so the page can
+            // put it in front of the reviewer rather than making them find it.
+            'action_url' => $this->subjectUrl.'?request='.$this->request->id,
         ];
     }
 }

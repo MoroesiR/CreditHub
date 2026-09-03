@@ -19,6 +19,7 @@ final class ChangeRequestReviewed extends Notification
         private readonly string $subjectLabel,
         private readonly bool $approved,
         private readonly string $reviewedBy,
+        private readonly string $subjectUrl,
     ) {}
 
     /**
@@ -48,7 +49,9 @@ final class ChangeRequestReviewed extends Notification
                     $this->subjectLabel,
                     $this->request->review_note ?? '',
                 ),
-            'action_url' => '/change-requests',
+            // The officer who asked is sent to the record too: what they want
+            // to see is whether it now reads correctly.
+            'action_url' => $this->subjectUrl.'?request='.$this->request->id,
         ];
     }
 }

@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 
 import { Spinner } from '@/components/Spinner'
 import { useAuth } from '@/features/auth/useAuth'
+import { RecordChangeRequests } from '@/features/change-requests/RecordChangeRequests'
 import { RequestChangeDialog } from '@/features/change-requests/RequestChangeDialog'
 import {
   fetchRecruiter,
@@ -255,6 +256,8 @@ export function RecruiterDetailPage() {
           </ol>
         )}
       </section>
+      <RecordChangeRequests subjectKind="recruiter" subjectId={recruiter.id} />
+
       {requestingChange && (
         <RequestChangeDialog
           subjectKind="recruiter"
@@ -262,13 +265,29 @@ export function RecruiterDetailPage() {
           subjectLabel={`${recruiter.full_name} (${recruiter.recruiter_number})`}
           onClose={() => setRequestingChange(false)}
           fields={[
-            { name: 'first_name', label: 'First name', current: recruiter.first_name },
-            { name: 'last_name', label: 'Last name', current: recruiter.last_name },
-            { name: 'id_number', label: 'ID number', current: recruiter.id_number },
-            { name: 'phone', label: 'Phone', current: recruiter.phone },
-            { name: 'email', label: 'Email', current: recruiter.email },
-            { name: 'bank_name', label: 'Bank', current: recruiter.bank_name },
             {
+              group: 'Identity',
+              name: 'first_name',
+              label: 'First name',
+              current: recruiter.first_name,
+            },
+            {
+              group: 'Identity',
+              name: 'last_name',
+              label: 'Last name',
+              current: recruiter.last_name,
+            },
+            {
+              group: 'Identity',
+              name: 'id_number',
+              label: 'ID number',
+              current: recruiter.id_number,
+            },
+            { group: 'Contact', name: 'phone', label: 'Phone', current: recruiter.phone },
+            { group: 'Contact', name: 'email', label: 'Email', current: recruiter.email },
+            { group: 'Banking', name: 'bank_name', label: 'Bank', current: recruiter.bank_name },
+            {
+              group: 'Banking',
               name: 'bank_account_number',
               label: 'Account number',
               current: recruiter.bank_account_number,

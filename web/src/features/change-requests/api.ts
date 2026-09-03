@@ -5,6 +5,8 @@ import type { Paginated } from '@/types/clients'
 export async function fetchChangeRequests(params: {
   status?: ChangeRequestStatus | ''
   page?: number
+  subject_kind?: 'client' | 'recruiter'
+  subject_id?: number
 }): Promise<Paginated<ChangeRequest>> {
   const { data } = await api.get<Paginated<ChangeRequest>>('/change-requests', {
     params: { ...params, status: params.status || undefined },

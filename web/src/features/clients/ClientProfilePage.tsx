@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { DocumentModal } from '@/components/DocumentModal'
+import { RecordChangeRequests } from '@/features/change-requests/RecordChangeRequests'
 import { RequestChangeDialog } from '@/features/change-requests/RequestChangeDialog'
 import { Spinner } from '@/components/Spinner'
 import { StatusBadge } from '@/features/applications/StatusBadge'
@@ -128,9 +129,21 @@ export function ClientProfilePage() {
 
   return (
     <div className="space-y-6">
-      <Link to="/clients" className="text-sm text-brand-600 hover:text-brand-700">
-        Back to clients
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link to="/clients" className="text-sm text-brand-600 hover:text-brand-700">
+          Back to clients
+        </Link>
+
+        {can('change-requests.create') && (
+          <button
+            type="button"
+            onClick={() => setRequestingChange(true)}
+            className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+          >
+            Request a change
+          </button>
+        )}
+      </div>
 
       <header className="flex flex-wrap items-start gap-6 rounded-lg border border-slate-200 bg-white p-6">
         <ClientPhoto
@@ -157,16 +170,6 @@ export function ClientProfilePage() {
               ? `Photograph taken at signing on ${formatDate(photo.captured_at)}`
               : 'No photograph on file. One is captured when an agreement is signed.'}
           </p>
-
-          {can('change-requests.create') && (
-            <button
-              type="button"
-              onClick={() => setRequestingChange(true)}
-              className="mt-3 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-            >
-              Request a change
-            </button>
-          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -387,6 +390,8 @@ export function ClientProfilePage() {
         )}
       </section>
 
+      <RecordChangeRequests subjectKind="client" subjectId={client.id} />
+
       {requestingChange && (
         <RequestChangeDialog
           subjectKind="client"
@@ -394,22 +399,29 @@ export function ClientProfilePage() {
           subjectLabel={`${client.full_name} (${client.client_number})`}
           onClose={() => setRequestingChange(false)}
           fields={[
-            { name: 'first_name', label: 'First name', current: client.first_name },
-            { name: 'last_name', label: 'Last name', current: client.last_name },
-            { name: 'id_number', label: 'ID number', current: client.id_number },
-            { name: 'phone', label: 'Phone', current: client.phone },
-            { name: 'email', label: 'Email', current: client.email },
-            { name: 'city', label: 'City', current: client.city },
-            { name: 'province', label: 'Province', current: client.province },
-            { name: 'employer_name', label: 'Employer', current: client.employer_name },
+            { group: 'Identity', name: 'first_name', label: 'First name', current: client.first_name },
+            { group: 'Identity', name: 'last_name', label: 'Last name', current: client.last_name },
+            { group: 'Identity', name: 'id_number', label: 'ID number', current: client.id_number },
+            { group: 'Contact', name: 'phone', label: 'Phone', current: client.phone },
+            { group: 'Contact', name: 'email', label: 'Email', current: client.email },
+            { group: 'Address', name: 'city', label: 'City', current: client.city },
+            { group: 'Address', name: 'province', label: 'Province', current: client.province },
             {
+              group: 'Employment',
+              name: 'employer_name',
+              label: 'Employer',
+              current: client.employer_name,
+            },
+            {
+              group: 'Employment',
               name: 'employment_status',
               label: 'Employment status',
               current: client.employment_status,
               options: EMPLOYMENT_OPTIONS,
             },
-            { name: 'bank_name', label: 'Bank', current: client.bank_name },
+            { group: 'Banking', name: 'bank_name', label: 'Bank', current: client.bank_name },
             {
+              group: 'Banking',
               name: 'bank_account_number',
               label: 'Account number',
               current: client.bank_account_number,

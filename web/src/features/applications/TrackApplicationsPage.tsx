@@ -18,6 +18,17 @@ const FILTERS: { value: ApplicationStatus | ''; label: string }[] = [
   { value: 'disbursed', label: 'Disbursed' },
 ]
 
+const CUSTODY_COLUMNS: {
+  key: 'captured' | 'decision' | 'agreement' | 'paid'
+  role: string
+  step: string
+}[] = [
+  { key: 'captured', role: 'Loan Officer', step: 'Captured' },
+  { key: 'decision', role: 'Credit Manager', step: 'Decision' },
+  { key: 'agreement', role: 'Loan Officer', step: 'Agreement signed' },
+  { key: 'paid', role: 'Disbursement Officer', step: 'Paid out' },
+]
+
 /**
  * One custody point: who did it and when, or why it has not happened yet.
  *
@@ -155,10 +166,15 @@ export function TrackApplicationsPage() {
                   <th className="px-4 py-3 font-medium">Client</th>
                   <th className="px-4 py-3 text-right font-medium">Amount</th>
                   <th className="px-4 py-3 text-right font-medium">Instalment</th>
-                  <th className="px-4 py-3 font-medium">Captured by</th>
-                  <th className="px-4 py-3 font-medium">Decision</th>
-                  <th className="px-4 py-3 font-medium">Agreement signed</th>
-                  <th className="px-4 py-3 font-medium">Paid out</th>
+                  {CUSTODY_COLUMNS.map((column) => (
+                    <th key={column.key} className="px-4 py-3 font-medium">
+                      {column.role}
+                      <br />
+                      <small className="font-normal normal-case text-slate-400">
+                        {column.step}
+                      </small>
+                    </th>
+                  ))}
                   <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
               </thead>
@@ -190,10 +206,13 @@ export function TrackApplicationsPage() {
                     <td className="px-4 py-3 text-right text-slate-700">
                       {formatMoney(application.monthly_instalment)}
                     </td>
-                    <StageCell journey={application.journey} stageKey="captured" />
-                    <StageCell journey={application.journey} stageKey="decision" />
-                    <StageCell journey={application.journey} stageKey="agreement" />
-                    <StageCell journey={application.journey} stageKey="paid" />
+                    {CUSTODY_COLUMNS.map((column) => (
+                      <StageCell
+                        key={column.key}
+                        journey={application.journey}
+                        stageKey={column.key}
+                      />
+                    ))}
                     <td className="px-4 py-3">
                       <StatusBadge
                         status={application.status}
