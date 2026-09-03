@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\Clients\IndexClientRequest;
 use App\Http\Requests\Api\V1\Clients\StoreClientRequest;
 use App\Http\Resources\ClientResource;
 use App\Models\Client;
+use App\Services\Clients\ClientProfile;
 use App\Services\Clients\ClientRegistrationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -18,6 +19,7 @@ final class ClientController extends Controller
 {
     public function __construct(
         private readonly ClientRegistrationService $registration,
+        private readonly ClientProfile $profile,
     ) {}
 
     public function index(IndexClientRequest $request): AnonymousResourceCollection
@@ -62,5 +64,21 @@ final class ClientController extends Controller
         return new ClientResource(
             $client->load(['recruiter', 'latestAffordability', 'registeredBy']),
         );
+    }
+
+    /**
+     * The whole file on one borrower: who they are, every application, every
+     * receipt, and every document held against them.
+     */
+    public function profile(Client $client): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'client' => new ClientResource(
+                    $client->load(['recruiter', 'latestAffordability', 'registeredBy']),
+                ),
+                ...$this->profile->build($client),
+            ],
+        ]);
     }
 }

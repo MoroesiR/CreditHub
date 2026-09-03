@@ -35,6 +35,8 @@ export interface Client {
   full_name: string
   id_number: string
   date_of_birth: string | null
+  gender: string | null
+  age: number | null
   phone: string
   email: string | null
   city: string | null

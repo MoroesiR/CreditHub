@@ -14,6 +14,7 @@ import { UsersPage } from '@/features/users/UsersPage'
 import { ApplicationDetailPage } from '@/features/applications/ApplicationDetailPage'
 import { CreateApplicationPage } from '@/features/applications/CreateApplicationPage'
 import { TrackApplicationsPage } from '@/features/applications/TrackApplicationsPage'
+import { ClientProfilePage } from '@/features/clients/ClientProfilePage'
 import { RegisterClientPage } from '@/features/clients/RegisterClientPage'
 import { RecruiterDetailPage } from '@/features/recruiters/RecruiterDetailPage'
 import { RecruiterSearchPage } from '@/features/recruiters/RecruiterSearchPage'
@@ -49,6 +50,14 @@ export function App() {
             element={
               <RequirePermission permission="clients.view">
                 <ClientSearchPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="/clients/:id"
+            element={
+              <RequirePermission permission="clients.view">
+                <ClientProfilePage />
               </RequirePermission>
             }
           />

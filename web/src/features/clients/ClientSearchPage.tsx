@@ -87,7 +87,12 @@ export function ClientSearchPage() {
                 {data.data.map((client) => (
                   <tr key={client.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-slate-900">{client.full_name}</p>
+                      <Link
+                        to={`/clients/${client.id}`}
+                        className="font-medium text-brand-700 hover:text-brand-800"
+                      >
+                        {client.full_name}
+                      </Link>
                       <p className="font-mono text-xs text-slate-500">{client.client_number}</p>
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-600">{client.id_number}</td>

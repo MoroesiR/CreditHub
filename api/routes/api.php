@@ -63,6 +63,11 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:'.Permissions::CLIENTS_VIEW)
             ->name('clients.show');
 
+        // The whole file on one borrower, assembled in one call.
+        Route::get('clients/{client}/profile', [ClientController::class, 'profile'])
+            ->middleware('permission:'.Permissions::CLIENTS_VIEW)
+            ->name('clients.profile');
+
         // A user's own notifications. Scoped to the signed-in user by the
         // relation itself, so there is no permission to declare.
         Route::get('notifications', [NotificationController::class, 'index'])

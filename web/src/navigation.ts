@@ -11,6 +11,8 @@ export interface ModuleChild {
   label: string
   permission: string
   summary: string
+  /** Same meaning as on a module: whose day to day work this is. */
+  primaryFor?: string[]
 }
 
 export interface Module {
@@ -63,6 +65,7 @@ export const MODULES: Module[] = [
         path: '/recruiters/register',
         label: 'Register recruiter',
         permission: 'recruiters.create',
+        primaryFor: ['loan-officer'],
         summary: 'Capture a recruiter and the account their commission is paid into.',
       },
       {
@@ -85,6 +88,7 @@ export const MODULES: Module[] = [
         path: '/applications/create',
         label: 'Create loan application',
         permission: 'applications.create',
+        primaryFor: ['loan-officer'],
         summary: 'Price a loan against the affordability on file and send it for a decision.',
       },
       {
@@ -94,14 +98,6 @@ export const MODULES: Module[] = [
         summary: 'Every application and where it has reached.',
       },
     ],
-  },
-  {
-    path: '/agreements',
-    primaryFor: ['admin'],
-    label: 'Agreements',
-    permission: 'agreements.view',
-    summary:
-      'Generate the credit agreement for an approved application and capture the client signature that releases it for payment.',
   },
   {
     path: '/disbursements',

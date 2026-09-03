@@ -29,7 +29,12 @@ export function AppLayout() {
       (module.primaryFor === undefined || module.primaryFor.some((slug) => roles.includes(slug))),
   ).map((module) => ({
     ...module,
-    children: module.children?.filter((child) => can(child.permission)) ?? [],
+    children:
+      module.children?.filter(
+        (child) =>
+          can(child.permission) &&
+          (child.primaryFor === undefined || child.primaryFor.some((slug) => roles.includes(slug))),
+      ) ?? [],
   }))
 
   return (
