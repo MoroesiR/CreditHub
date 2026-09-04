@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { DocumentModal } from '@/components/DocumentModal'
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
@@ -35,6 +36,11 @@ export function RecordChangeRequests({
   const [error, setError] = useState<string | null>(null)
   const [rejecting, setRejecting] = useState<number | null>(null)
   const [note, setNote] = useState('')
+  const [viewing, setViewing] = useState<{ path: string; title: string; subtitle: string } | null>(
+    null,
+  )
+  const onView = setViewing
+
 
   const mayReview = can('change-requests.review')
 
@@ -92,19 +98,28 @@ export function RecordChangeRequests({
     <section
       ref={anchorRef}
       className={`rounded-lg border p-6 ${
-        pending.length > 0 ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'
+        pending.length > 0 ? 'border-warn-200 bg-warn-50' : 'border-ink-200 bg-white'
       }`}
     >
+      {viewing && (
+        <DocumentModal
+          path={viewing.path}
+          title={viewing.title}
+          subtitle={viewing.subtitle}
+          onClose={() => setViewing(null)}
+        />
+      )}
+
       <h2
         className={`text-sm font-semibold uppercase tracking-wide ${
-          pending.length > 0 ? 'text-amber-900' : 'text-slate-500'
+          pending.length > 0 ? 'text-warn-900' : 'text-ink-500'
         }`}
       >
         {pending.length > 0 ? 'Change requested' : 'Recent change request'}
       </h2>
 
       {error && (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <p className="mt-3 rounded-md border border-bad-200 bg-bad-50 p-3 text-sm text-bad-700">
           {error}
         </p>
       )}
@@ -114,20 +129,20 @@ export function RecordChangeRequests({
           <li
             key={request.id}
             className={`rounded-md bg-white p-4 ${
-              request.id === highlighted ? 'ring-2 ring-amber-300' : 'border border-slate-200'
+              request.id === highlighted ? 'ring-2 ring-warn-300' : 'border border-ink-200'
             }`}
           >
-            <p className="text-sm text-slate-700">{request.reason}</p>
+            <p className="text-sm text-ink-700">{request.reason}</p>
 
             <dl className="mt-3 space-y-1">
               {Object.entries(request.changes).map(([field, value]) => (
                 <div key={field} className="flex flex-wrap items-baseline gap-2 text-sm">
-                  <dt className="font-medium capitalize text-slate-700">
+                  <dt className="font-medium capitalize text-ink-700">
                     {field.replace(/_/g, ' ')}
                   </dt>
-                  <dd className="text-slate-900">
+                  <dd className="text-ink-900">
                     {request.replaced_values?.[field] && (
-                      <span className="mr-2 text-slate-400 line-through">
+                      <span className="mr-2 text-ink-400 line-through">
                         {request.replaced_values[field]}
                       </span>
                     )}
@@ -137,7 +152,40 @@ export function RecordChangeRequests({
               ))}
             </dl>
 
-            <p className="mt-3 text-xs text-slate-500">
+{request.documents && request.documents.length > 0 && (
+              <div className="mt-3 rounded-md border border-ink-200 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
+                  Proof attached
+                </p>
+                <ul className="mt-2 space-y-1">
+                  {request.documents.map((document) => (
+                    <li key={document.id} className="flex items-center justify-between gap-3">
+                      <span className="min-w-0 text-sm text-ink-700">
+                        {document.type_label}
+                        <span className="ml-2 truncate text-xs text-ink-500">
+                          {document.original_name}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onView({
+                            path: `/change-requests/${request.id}/documents/${document.id}`,
+                            title: document.type_label,
+                            subtitle: document.original_name,
+                          })
+                        }
+                        className="whitespace-nowrap rounded-md border border-ink-300 px-2.5 py-1 text-xs font-medium text-ink-700 hover:bg-ink-100"
+                      >
+                        View
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <p className="mt-3 text-xs text-ink-500">
               Asked by {request.requested_by ?? 'unknown'} · {formatDateTime(request.created_at)}
               {request.reviewed_at
                 ? ` · ${request.status_label} by ${request.reviewed_by} · ${formatDateTime(request.reviewed_at)}`
@@ -145,7 +193,7 @@ export function RecordChangeRequests({
             </p>
 
             {request.review_note && (
-              <p className="mt-1 text-xs text-slate-600">Note: {request.review_note}</p>
+              <p className="mt-1 text-xs text-ink-600">Note: {request.review_note}</p>
             )}
 
             {mayReview && request.status === 'pending' && (
@@ -155,7 +203,7 @@ export function RecordChangeRequests({
                     type="button"
                     onClick={() => approve.mutate(request.id)}
                     disabled={approve.isPending}
-                    className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+                    className="rounded-md bg-good-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-good-700 disabled:opacity-60"
                   >
                     Approve and apply
                   </button>
@@ -165,23 +213,23 @@ export function RecordChangeRequests({
                       setRejecting(request.id)
                       setError(null)
                     }}
-                    className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
+                    className="rounded-md border border-bad-300 px-3 py-1.5 text-sm font-medium text-bad-700 hover:bg-bad-50"
                   >
                     Reject
                   </button>
                 </div>
 
                 {rejecting === request.id && (
-                  <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3">
+                  <div className="mt-3 rounded-md border border-bad-200 bg-bad-50 p-3">
                     <label className="block">
-                      <span className="text-sm font-medium text-red-900">
+                      <span className="text-sm font-medium text-bad-900">
                         Why is this being rejected?
                       </span>
                       <input
                         value={note}
                         onChange={(event) => setNote(event.target.value)}
                         placeholder="The officer is told this, so they know what to correct."
-                        className="mt-1 w-full rounded-md border border-red-300 bg-white px-3 py-2 text-sm outline-none focus:border-red-500"
+                        className="mt-1 w-full rounded-md border border-bad-300 bg-white px-3 py-2 text-sm outline-none focus:border-bad-500"
                       />
                     </label>
                     <div className="mt-3 flex gap-2">
@@ -189,14 +237,14 @@ export function RecordChangeRequests({
                         type="button"
                         onClick={() => reject.mutate({ id: request.id, why: note })}
                         disabled={note.trim().length === 0 || reject.isPending}
-                        className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                        className="rounded-md bg-bad-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-bad-700 disabled:opacity-60"
                       >
                         Confirm rejection
                       </button>
                       <button
                         type="button"
                         onClick={() => setRejecting(null)}
-                        className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-900 hover:bg-red-100"
+                        className="rounded-md border border-bad-300 px-3 py-1.5 text-sm font-medium text-bad-900 hover:bg-bad-100"
                       >
                         Cancel
                       </button>

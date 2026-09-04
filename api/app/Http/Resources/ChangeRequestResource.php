@@ -45,6 +45,14 @@ class ChangeRequestResource extends JsonResource
                 },
             ),
 
+            'documents' => $this->whenLoaded('documents', fn () => $this->documents->map(fn ($document): array => [
+                'id' => $document->id,
+                'type' => $document->type->value,
+                'type_label' => $document->type->label(),
+                'original_name' => $document->original_name,
+                'size_bytes' => $document->size_bytes,
+            ])->values()),
+
             'requested_by' => $this->whenLoaded('requestedBy', fn () => $this->requestedBy?->fullName()),
             'reviewed_by' => $this->whenLoaded('reviewedBy', fn () => $this->reviewedBy?->fullName()),
             'reviewed_at' => $this->reviewed_at?->toIso8601String(),

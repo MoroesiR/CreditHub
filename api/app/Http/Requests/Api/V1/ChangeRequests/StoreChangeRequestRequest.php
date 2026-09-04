@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1\ChangeRequests;
 
+use App\Services\ChangeRequests\ChangeRequestService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,6 +28,17 @@ class StoreChangeRequestRequest extends FormRequest
             'reason' => ['required', 'string', 'max:255'],
             'changes' => ['required', 'array', 'min:1'],
             'changes.*' => ['nullable', 'string', 'max:255'],
+
+            // Which of these are actually required depends on what is being
+            // changed, and the service decides that: a surname needs an ID
+            // copy, a bank account needs a statement. Here they are only
+            // checked for being the kind of file we accept at all.
+            'documents' => ['nullable', 'array'],
+            'documents.*' => [
+                'file',
+                'mimes:'.implode(',', ChangeRequestService::ALLOWED_EXTENSIONS),
+                'max:'.ChangeRequestService::MAX_KILOBYTES,
+            ],
         ];
     }
 

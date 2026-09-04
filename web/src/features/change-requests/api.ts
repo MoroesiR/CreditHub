@@ -20,14 +20,49 @@ export interface SubmitChangeRequestPayload {
   subject_id: number
   reason: string
   changes: Record<string, string>
+  documents: Record<string, File>
 }
 
 export async function submitChangeRequest(
   payload: SubmitChangeRequestPayload,
 ): Promise<ChangeRequest> {
-  const { data } = await api.post<{ data: ChangeRequest }>('/change-requests', payload)
+  // Multipart because the proof travels with the request: the API will not
+  // record a name or a bank change without it.
+  const form = new FormData()
+  form.append('subject_kind', payload.subject_kind)
+  form.append('subject_id', String(payload.subject_id))
+  form.append('reason', payload.reason)
+
+  for (const [field, value] of Object.entries(payload.changes)) {
+    form.append(`changes[${field}]`, value)
+  }
+
+  for (const [type, file] of Object.entries(payload.documents)) {
+    form.append(`documents[${type}]`, file)
+  }
+
+  const { data } = await api.post<{ data: ChangeRequest }>('/change-requests', form)
 
   return data.data
+}
+
+/** Attached proof is private, so it is fetched as an authenticated blob. */
+export async function downloadChangeRequestDocument(
+  requestId: number,
+  documentId: number,
+  filename: string,
+): Promise<void> {
+  const response = await api.get<Blob>(
+    `/change-requests/${requestId}/documents/${documentId}`,
+    { responseType: 'blob' },
+  )
+
+  const url = URL.createObjectURL(response.data)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  anchor.click()
+  URL.revokeObjectURL(url)
 }
 
 export async function approveChangeRequest(id: number, note?: string): Promise<ChangeRequest> {

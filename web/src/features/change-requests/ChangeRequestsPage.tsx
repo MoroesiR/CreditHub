@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { DocumentModal } from '@/components/DocumentModal'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -21,9 +22,9 @@ const FILTERS: { value: ChangeRequestStatus | ''; label: string }[] = [
 ]
 
 const STATUS_STYLES: Record<ChangeRequestStatus, string> = {
-  pending: 'bg-amber-50 text-amber-800 ring-1 ring-amber-200',
-  approved: 'bg-emerald-600 text-white',
-  rejected: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+  pending: 'bg-warn-50 text-warn-800 ring-1 ring-warn-200',
+  approved: 'bg-good-600 text-white',
+  rejected: 'bg-bad-50 text-bad-700 ring-1 ring-bad-200',
 }
 
 function FieldChange({ request }: { request: ChangeRequest }) {
@@ -31,15 +32,15 @@ function FieldChange({ request }: { request: ChangeRequest }) {
     <dl className="mt-3 space-y-1">
       {Object.entries(request.changes).map(([field, value]) => (
         <div key={field} className="flex flex-wrap items-baseline gap-2 text-sm">
-          <dt className="font-medium capitalize text-slate-700">{field.replace(/_/g, ' ')}</dt>
-          <dd className="text-slate-500">
+          <dt className="font-medium capitalize text-ink-700">{field.replace(/_/g, ' ')}</dt>
+          <dd className="text-ink-500">
             {request.replaced_values?.[field] ? (
               <>
                 <span className="line-through">{request.replaced_values[field]}</span>{' '}
-                <span className="text-slate-900">{value}</span>
+                <span className="text-ink-900">{value}</span>
               </>
             ) : (
-              <span className="text-slate-900">{value}</span>
+              <span className="text-ink-900">{value}</span>
             )}
           </dd>
         </div>
@@ -56,6 +57,11 @@ export function ChangeRequestsPage() {
   const [error, setError] = useState<string | null>(null)
   const [rejecting, setRejecting] = useState<number | null>(null)
   const [note, setNote] = useState('')
+  const [viewing, setViewing] = useState<{ path: string; title: string; subtitle: string } | null>(
+    null,
+  )
+  const onView = setViewing
+
 
   const mayReview = can('change-requests.review')
 
@@ -91,9 +97,18 @@ export function ChangeRequestsPage() {
 
   return (
     <div className="space-y-6">
+      {viewing && (
+        <DocumentModal
+          path={viewing.path}
+          title={viewing.title}
+          subtitle={viewing.subtitle}
+          onClose={() => setViewing(null)}
+        />
+      )}
+
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Change requests</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-ink-500">
           {mayReview
             ? 'Corrections to a client or recruiter, waiting on an administrator. Nothing on the record moves until one is approved.'
             : 'Corrections you have asked an administrator to make. Nothing changes until one is approved.'}
@@ -101,7 +116,7 @@ export function ChangeRequestsPage() {
       </header>
 
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           {error}
         </p>
       )}
@@ -118,7 +133,7 @@ export function ChangeRequestsPage() {
             className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               status === filter.value
                 ? 'bg-brand-50 text-brand-700'
-                : 'text-slate-600 hover:bg-slate-100'
+                : 'text-ink-600 hover:bg-ink-100'
             }`}
           >
             {filter.label}
@@ -131,17 +146,17 @@ export function ChangeRequestsPage() {
           <Spinner />
         </div>
       ) : isError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           Change requests could not be loaded.
         </p>
       ) : data.data.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+        <p className="rounded-lg border border-dashed border-ink-300 bg-white p-8 text-center text-sm text-ink-500">
           Nothing in this view.
         </p>
       ) : (
         <ul className="space-y-3">
           {data.data.map((request) => (
-            <li key={request.id} className="rounded-lg border border-slate-200 bg-white p-5">
+            <li key={request.id} className="rounded-lg border border-ink-200 bg-white p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-3">
@@ -160,16 +175,49 @@ export function ChangeRequestsPage() {
                     >
                       {request.status_label}
                     </span>
-                    <span className="text-xs uppercase tracking-wide text-slate-400">
+                    <span className="text-xs uppercase tracking-wide text-ink-400">
                       {request.subject_kind}
                     </span>
                   </div>
 
-                  <p className="mt-2 text-sm text-slate-600">{request.reason}</p>
+                  <p className="mt-2 text-sm text-ink-600">{request.reason}</p>
 
                   <FieldChange request={request} />
 
-                  <p className="mt-3 text-xs text-slate-500">
+      {request.documents && request.documents.length > 0 && (
+                    <div className="mt-3 rounded-md border border-ink-200 p-3">
+                      <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
+                        Proof attached
+                      </p>
+                      <ul className="mt-2 space-y-1">
+                        {request.documents.map((document) => (
+                          <li key={document.id} className="flex items-center justify-between gap-3">
+                            <span className="min-w-0 text-sm text-ink-700">
+                              {document.type_label}
+                              <span className="ml-2 truncate text-xs text-ink-500">
+                                {document.original_name}
+                              </span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onView({
+                                  path: `/change-requests/${request.id}/documents/${document.id}`,
+                                  title: document.type_label,
+                                  subtitle: document.original_name,
+                                })
+                              }
+                              className="whitespace-nowrap rounded-md border border-ink-300 px-2.5 py-1 text-xs font-medium text-ink-700 hover:bg-ink-100"
+                            >
+                              View
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <p className="mt-3 text-xs text-ink-500">
                     Asked by {request.requested_by ?? 'unknown'} ·{' '}
                     {formatDateTime(request.created_at)}
                     {request.reviewed_at
@@ -178,7 +226,7 @@ export function ChangeRequestsPage() {
                   </p>
 
                   {request.review_note && (
-                    <p className="mt-1 text-xs text-slate-600">Note: {request.review_note}</p>
+                    <p className="mt-1 text-xs text-ink-600">Note: {request.review_note}</p>
                   )}
                 </div>
 
@@ -188,7 +236,7 @@ export function ChangeRequestsPage() {
                       type="button"
                       onClick={() => approve.mutate(request.id)}
                       disabled={approve.isPending}
-                      className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+                      className="rounded-md bg-good-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-good-700 disabled:opacity-60"
                     >
                       Approve
                     </button>
@@ -198,7 +246,7 @@ export function ChangeRequestsPage() {
                         setRejecting(request.id)
                         setError(null)
                       }}
-                      className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
+                      className="rounded-md border border-bad-300 px-3 py-1.5 text-sm font-medium text-bad-700 hover:bg-bad-50"
                     >
                       Reject
                     </button>
@@ -207,16 +255,16 @@ export function ChangeRequestsPage() {
               </div>
 
               {rejecting === request.id && (
-                <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-4">
+                <div className="mt-4 rounded-md border border-bad-200 bg-bad-50 p-4">
                   <label className="block">
-                    <span className="text-sm font-medium text-red-900">
+                    <span className="text-sm font-medium text-bad-900">
                       Why is this being rejected?
                     </span>
                     <input
                       value={note}
                       onChange={(event) => setNote(event.target.value)}
                       placeholder="The officer is told this, so they know what to correct."
-                      className="mt-1 w-full max-w-lg rounded-md border border-red-300 bg-white px-3 py-2 text-sm outline-none focus:border-red-500"
+                      className="mt-1 w-full max-w-lg rounded-md border border-bad-300 bg-white px-3 py-2 text-sm outline-none focus:border-bad-500"
                     />
                   </label>
                   <div className="mt-3 flex gap-2">
@@ -224,14 +272,14 @@ export function ChangeRequestsPage() {
                       type="button"
                       onClick={() => reject.mutate({ id: request.id, why: note })}
                       disabled={note.trim().length === 0 || reject.isPending}
-                      className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                      className="rounded-md bg-bad-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-bad-700 disabled:opacity-60"
                     >
                       Confirm rejection
                     </button>
                     <button
                       type="button"
                       onClick={() => setRejecting(null)}
-                      className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-900 hover:bg-red-100"
+                      className="rounded-md border border-bad-300 px-3 py-1.5 text-sm font-medium text-bad-900 hover:bg-bad-100"
                     >
                       Cancel
                     </button>
@@ -244,7 +292,7 @@ export function ChangeRequestsPage() {
       )}
 
       {data && data.meta.last_page > 1 && (
-        <div className="flex items-center justify-between text-sm text-slate-500">
+        <div className="flex items-center justify-between text-sm text-ink-500">
           <p>
             Showing {data.meta.from ?? 0}-{data.meta.to ?? 0} of {data.meta.total}
           </p>
@@ -253,7 +301,7 @@ export function ChangeRequestsPage() {
               type="button"
               onClick={() => setPage((current) => Math.max(1, current - 1))}
               disabled={data.meta.current_page <= 1}
-              className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+              className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 hover:bg-ink-100 disabled:opacity-50"
             >
               Previous
             </button>
@@ -261,7 +309,7 @@ export function ChangeRequestsPage() {
               type="button"
               onClick={() => setPage((current) => current + 1)}
               disabled={data.meta.current_page >= data.meta.last_page}
-              className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+              className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 hover:bg-ink-100 disabled:opacity-50"
             >
               Next
             </button>

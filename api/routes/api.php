@@ -63,6 +63,15 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:'.Permissions::CHANGE_REQUESTS_CREATE)
             ->name('change-requests.store');
 
+        // The attached proof is personal data, so it is streamed after the
+        // permission check rather than served from a path.
+        Route::get(
+            'change-requests/{changeRequest}/documents/{document}',
+            [ChangeRequestController::class, 'downloadDocument'],
+        )
+            ->middleware('permission:'.Permissions::CHANGE_REQUESTS_VIEW)
+            ->name('change-requests.documents.download');
+
         Route::post('change-requests/{changeRequest}/approval', [ChangeRequestController::class, 'approve'])
             ->middleware('permission:'.Permissions::CHANGE_REQUESTS_REVIEW)
             ->name('change-requests.approve');

@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\ChangeRequests;
 
+use App\Enums\ApplicationDocumentType;
 use App\Enums\ChangeRequestStatus;
+use App\Enums\LoanApplicationStatus;
+use App\Models\ApplicationDocument;
 use App\Models\ChangeRequest;
+use App\Models\ChangeRequestDocument;
 use App\Models\Client;
 use App\Models\Recruiter;
 use App\Models\User;
@@ -18,11 +22,20 @@ use App\Support\Permissions;
 use App\Support\SouthAfricanBanks;
 use App\Support\SouthAfricanProvinces;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 final class ChangeRequestService
 {
+    private const DISK = 'local';
+
+    public const MAX_KILOBYTES = 5120;
+
+    public const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png'];
+
     /**
      * What may be asked for, per record type.
      *
@@ -46,10 +59,50 @@ final class ChangeRequestService
         ],
     ];
 
+    /**
+     * What has to be produced before a change is considered.
+     *
+     * A request to change a surname is one person repeating what another told
+     * them on the telephone. The ID copy is the thing an administrator can
+     * actually decide on, and a bank statement is the only evidence that an
+     * account belongs to the person about to be paid from it.
+     *
+     * @var array<string, string>
+     */
+    private const EVIDENCE_FOR = [
+        'first_name' => ApplicationDocumentType::IdCopy->value,
+        'last_name' => ApplicationDocumentType::IdCopy->value,
+        'id_number' => ApplicationDocumentType::IdCopy->value,
+        'bank_name' => ApplicationDocumentType::BankStatement->value,
+        'bank_account_number' => ApplicationDocumentType::BankStatement->value,
+        'employer_name' => ApplicationDocumentType::Payslip->value,
+        'job_title' => ApplicationDocumentType::Payslip->value,
+        'employment_status' => ApplicationDocumentType::Payslip->value,
+    ];
+
     public function __construct(
         private readonly AuditRecorder $audit,
         private readonly NotificationAudience $audience,
     ) {}
+
+    /**
+     * The documents a given set of changes must be accompanied by.
+     *
+     * @param  array<int, string>  $fields
+     * @return array<int, string>
+     */
+    public static function evidenceRequiredFor(array $fields): array
+    {
+        $required = [];
+
+        foreach ($fields as $field) {
+            if (isset(self::EVIDENCE_FOR[$field])) {
+                $required[] = self::EVIDENCE_FOR[$field];
+            }
+        }
+
+        return array_values(array_unique($required));
+    }
 
     /**
      * @return array<int, string>
@@ -61,6 +114,7 @@ final class ChangeRequestService
 
     /**
      * @param  array<string, mixed>  $changes
+     * @param  array<string, UploadedFile>  $documents  Keyed by document type.
      */
     public function submit(
         Model $subject,
@@ -68,6 +122,7 @@ final class ChangeRequestService
         string $reason,
         User $requestedBy,
         ?string $ipAddress = null,
+        array $documents = [],
     ): ChangeRequest {
         $editable = self::editableFieldsFor($subject);
 
@@ -91,6 +146,21 @@ final class ChangeRequestService
 
         $this->assertClosedListsHold($changes);
 
+        $missing = array_diff(
+            self::evidenceRequiredFor(array_keys($changes)),
+            array_keys($documents),
+        );
+
+        if ($missing !== []) {
+            throw new RuntimeException(sprintf(
+                'This change has to be supported by: %s.',
+                implode(', ', array_map(
+                    static fn (string $type): string => strtolower(ApplicationDocumentType::from($type)->label()),
+                    $missing,
+                )),
+            ));
+        }
+
         // One outstanding request per record. Two pending edits to the same
         // bank account would leave an administrator approving them in
         // sequence, the second silently overwriting the first, with no way to
@@ -107,7 +177,7 @@ final class ChangeRequestService
             );
         }
 
-        return DB::transaction(function () use ($subject, $changes, $reason, $requestedBy, $ipAddress): ChangeRequest {
+        return DB::transaction(function () use ($subject, $changes, $reason, $requestedBy, $ipAddress, $documents): ChangeRequest {
             $request = ChangeRequest::create([
                 'subject_type' => $subject::class,
                 'subject_id' => $subject->getKey(),
@@ -116,6 +186,10 @@ final class ChangeRequestService
                 'changes' => $changes,
                 'status' => ChangeRequestStatus::Pending,
             ]);
+
+            foreach ($documents as $type => $file) {
+                $this->storeEvidence($request, ApplicationDocumentType::from($type), $file, $requestedBy);
+            }
 
             $label = $this->labelFor($subject);
 
@@ -158,6 +232,8 @@ final class ChangeRequestService
             throw new RuntimeException('The record this request refers to no longer exists.');
         }
 
+        $request->loadMissing('documents');
+
         return DB::transaction(function () use ($request, $subject, $reviewedBy, $note, $ipAddress): ChangeRequest {
             $changes = array_intersect_key(
                 $request->changes,
@@ -197,19 +273,29 @@ final class ChangeRequestService
                 'replaced_values' => $replaced,
             ]);
 
+            $replacedDocuments = $this->replaceApplicationDocuments($request, $subject, $reviewedBy);
+
             $label = $this->labelFor($subject);
 
             $this->audit->record(
                 action: 'change_request.approved',
                 subject: $subject,
                 summary: sprintf(
-                    'Approved a change to %s (%s), requested by %s.',
+                    'Approved a change to %s (%s), requested by %s.%s',
                     $label,
                     implode(', ', array_keys($changes)),
                     $request->requestedBy?->fullName() ?? 'a colleague',
+                    $replacedDocuments === []
+                        ? ''
+                        : ' Documents replaced on '.implode('; ', $replacedDocuments).'.',
                 ),
                 actor: $reviewedBy,
-                metadata: ['change_request_id' => $request->id, 'applied' => $changes, 'replaced' => $replaced],
+                metadata: [
+                    'change_request_id' => $request->id,
+                    'applied' => $changes,
+                    'replaced' => $replaced,
+                    'documents_replaced' => $replacedDocuments,
+                ],
                 ipAddress: $ipAddress,
             );
 
@@ -263,6 +349,110 @@ final class ChangeRequestService
 
             return $request->fresh();
         });
+    }
+
+    /**
+     * Writes an attached document to private storage.
+     *
+     * Same two rules as everywhere else a document is taken: a generated name,
+     * because the one the browser sent is attacker controlled, and the private
+     * disk, because an ID copy reachable by guessing a URL is a breach.
+     */
+    private function storeEvidence(
+        ChangeRequest $request,
+        ApplicationDocumentType $type,
+        UploadedFile $file,
+        User $uploadedBy,
+    ): ChangeRequestDocument {
+        $path = $file->storeAs(
+            "change-requests/{$request->id}",
+            Str::uuid()->toString().'.'.$file->extension(),
+            ['disk' => self::DISK],
+        );
+
+        return ChangeRequestDocument::create([
+            'change_request_id' => $request->id,
+            'type' => $type,
+            'original_name' => $file->getClientOriginalName(),
+            'path' => $path,
+            'mime_type' => $file->getMimeType() ?? 'application/octet-stream',
+            'size_bytes' => $file->getSize() ?: 0,
+            'uploaded_by' => $uploadedBy->id,
+        ]);
+    }
+
+    /**
+     * Puts the approved documents onto the client's open loan files.
+     *
+     * Only files still in flight are touched. A disbursed or declined
+     * application keeps the documents it was actually decided on: overwriting
+     * those would rewrite the evidence behind a decision already taken and
+     * money already paid, which is the opposite of what an audit trail is for.
+     *
+     * @return array<int, string>
+     */
+    private function replaceApplicationDocuments(
+        ChangeRequest $request,
+        Model $subject,
+        User $approvedBy,
+    ): array {
+        if (! $subject instanceof Client) {
+            return [];
+        }
+
+        $documents = $request->documents;
+
+        if ($documents->isEmpty()) {
+            return [];
+        }
+
+        $openApplications = $subject->loanApplications()
+            ->whereNotIn('status', [
+                LoanApplicationStatus::Disbursed,
+                LoanApplicationStatus::Declined,
+                LoanApplicationStatus::Cancelled,
+            ])
+            ->get();
+
+        $touched = [];
+
+        foreach ($openApplications as $application) {
+            foreach ($documents as $document) {
+                $existing = ApplicationDocument::query()
+                    ->where('loan_application_id', $application->id)
+                    ->where('type', $document->type)
+                    ->first();
+
+                $copy = "applications/{$application->id}/".Str::uuid()->toString()
+                    .'.'.pathinfo($document->path, PATHINFO_EXTENSION);
+
+                Storage::disk(self::DISK)->copy($document->path, $copy);
+
+                $supersededPath = $existing?->path;
+
+                ApplicationDocument::updateOrCreate(
+                    ['loan_application_id' => $application->id, 'type' => $document->type],
+                    [
+                        'original_name' => $document->original_name,
+                        'path' => $copy,
+                        'mime_type' => $document->mime_type,
+                        'size_bytes' => $document->size_bytes,
+                        'uploaded_by' => $approvedBy->id,
+                    ],
+                );
+
+                // The row no longer points at it, and keeping an identity
+                // document nothing references is a retention problem rather
+                // than a safety net. The request keeps its own copy.
+                if ($supersededPath !== null) {
+                    Storage::disk(self::DISK)->delete($supersededPath);
+                }
+
+                $touched[] = $application->application_number.': '.$document->type->label();
+            }
+        }
+
+        return $touched;
     }
 
     /**

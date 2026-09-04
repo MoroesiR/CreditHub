@@ -8,6 +8,7 @@ use App\Enums\ChangeRequestStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 #[Fillable([
@@ -35,6 +36,14 @@ class ChangeRequest extends Model
     public function subject(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * @return HasMany<ChangeRequestDocument, $this>
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ChangeRequestDocument::class);
     }
 
     /**

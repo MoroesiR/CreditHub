@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\ChangeRequests\StoreChangeRequestRequest;
 use App\Http\Resources\ChangeRequestResource;
 use App\Models\ChangeRequest;
+use App\Models\ChangeRequestDocument;
 use App\Models\Client;
 use App\Models\Recruiter;
 use App\Services\ChangeRequests\ChangeRequestService;
@@ -15,8 +16,10 @@ use App\Support\Permissions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ChangeRequestController extends Controller
 {
@@ -29,7 +32,7 @@ final class ChangeRequestController extends Controller
         $user = $request->user();
 
         $requests = ChangeRequest::query()
-            ->with(['subject', 'requestedBy', 'reviewedBy'])
+            ->with(['subject', 'requestedBy', 'reviewedBy', 'documents'])
             // Whoever cannot decide a request sees only their own. An officer
             // has no reason to read a colleague's correction to a file they
             // are not working on.
@@ -80,6 +83,7 @@ final class ChangeRequestController extends Controller
                 reason: $request->validated('reason'),
                 requestedBy: $request->user(),
                 ipAddress: $request->ip(),
+                documents: $request->file('documents', []),
             );
         } catch (RuntimeException $exception) {
             return response()->json(
@@ -89,7 +93,7 @@ final class ChangeRequestController extends Controller
         }
 
         return (new ChangeRequestResource(
-            $created->load(['subject', 'requestedBy']),
+            $created->load(['subject', 'requestedBy', 'documents']),
         ))->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
@@ -127,6 +131,16 @@ final class ChangeRequestController extends Controller
         );
     }
 
+    public function downloadDocument(
+        ChangeRequest $changeRequest,
+        ChangeRequestDocument $document,
+    ): StreamedResponse {
+        abort_unless($document->change_request_id === $changeRequest->id, Response::HTTP_NOT_FOUND);
+        abort_unless(Storage::disk('local')->exists($document->path), Response::HTTP_NOT_FOUND);
+
+        return Storage::disk('local')->download($document->path, $document->original_name);
+    }
+
     /**
      * @param  callable(): ChangeRequest  $action
      */
@@ -143,7 +157,7 @@ final class ChangeRequestController extends Controller
 
         return response()->json([
             'data' => new ChangeRequestResource(
-                $decided->load(['subject', 'requestedBy', 'reviewedBy']),
+                $decided->load(['subject', 'requestedBy', 'reviewedBy', 'documents']),
             ),
         ]);
     }
