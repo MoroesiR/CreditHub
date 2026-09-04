@@ -123,7 +123,7 @@ final class PortfolioReport
             ->with('disbursement')
             ->get();
 
-        $accounts = new LoanAccount();
+        $accounts = new LoanAccount;
 
         $collected = 0.0;
         $outstanding = 0.0;

@@ -31,7 +31,7 @@ class StoreRecruiterRequest extends FormRequest
             'id_number' => [
                 'required',
                 'string',
-                new SouthAfricanIdNumber(),
+                new SouthAfricanIdNumber,
                 Rule::unique('recruiters', 'id_number')->whereNull('deleted_at'),
             ],
             'phone' => ['required', 'string', 'max:20'],

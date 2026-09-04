@@ -22,7 +22,9 @@ use RuntimeException;
 final class ReferenceNumberService
 {
     private const CLIENT = 'client';
+
     private const RECRUITER = 'recruiter';
+
     private const APPLICATION = 'application';
 
     /** Shared house prefix, taken from the CreditHub name. */

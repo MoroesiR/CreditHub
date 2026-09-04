@@ -6,8 +6,10 @@ namespace App\Services\Clients;
 
 use App\Models\Client;
 use App\Models\LoanAgreement;
+use App\Models\LoanApplication;
 use App\Models\LoanRepayment;
 use App\Services\Repayments\LoanAccount;
+use Illuminate\Support\Collection;
 
 /**
  * Everything held about one borrower, gathered for the profile screen.
@@ -144,7 +146,7 @@ final class ClientProfile
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, \App\Models\LoanApplication>  $applications
+     * @param  Collection<int, LoanApplication>  $applications
      * @return array<string, mixed>
      */
     private function totals(Client $client, $applications): array

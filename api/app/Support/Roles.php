@@ -22,6 +22,7 @@ final class Roles
     public const DISBURSEMENT_OFFICER = 'disbursement-officer';
 
     public const COLLECTIONS_OFFICER = 'collections-officer';
+
     public const AUDITOR = 'auditor';
 
     /**

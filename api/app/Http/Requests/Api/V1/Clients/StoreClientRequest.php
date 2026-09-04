@@ -30,7 +30,7 @@ class StoreClientRequest extends FormRequest
             'id_number' => [
                 'required',
                 'string',
-                new SouthAfricanIdNumber(),
+                new SouthAfricanIdNumber,
                 Rule::unique('clients', 'id_number')->whereNull('deleted_at'),
             ],
             // date_of_birth and gender are absent by design: both are read out
@@ -66,7 +66,7 @@ class StoreClientRequest extends FormRequest
             'new_recruiter.id_number' => [
                 'required_with:new_recruiter',
                 'string',
-                new SouthAfricanIdNumber(),
+                new SouthAfricanIdNumber,
                 Rule::unique('recruiters', 'id_number')->whereNull('deleted_at'),
             ],
             'new_recruiter.phone' => ['required_with:new_recruiter', 'string', 'max:20'],

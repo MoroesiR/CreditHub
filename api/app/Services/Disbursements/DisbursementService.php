@@ -41,7 +41,7 @@ final class DisbursementService
     /**
      * Records that the file has been checked.
      *
-     * Verification is its own act with its own timestamp and its own actor - 
+     * Verification is its own act with its own timestamp and its own actor -
      * "who checked it" and "who released the money" are separate questions.
      */
     public function verify(

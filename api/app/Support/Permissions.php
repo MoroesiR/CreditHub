@@ -50,6 +50,7 @@ final class Permissions
     public const DISBURSEMENTS_PAY = 'disbursements.pay';
 
     public const REPAYMENTS_VIEW = 'repayments.view';
+
     public const REPAYMENTS_RECORD = 'repayments.record';
 
     public const COMMISSIONS_VIEW = 'commissions.view';
@@ -63,7 +64,9 @@ final class Permissions
     public const REPORTS_VIEW = 'reports.view';
 
     public const CHANGE_REQUESTS_VIEW = 'change-requests.view';
+
     public const CHANGE_REQUESTS_CREATE = 'change-requests.create';
+
     public const CHANGE_REQUESTS_REVIEW = 'change-requests.review';
 
     /**
