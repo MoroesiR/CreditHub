@@ -75,7 +75,7 @@ export function UsersPage() {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Staff accounts</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-ink-500">
             Who may sign in, and what each of them is allowed to do. A role decides that, so
             changing someone's role changes what they can reach immediately.
           </p>
@@ -97,20 +97,20 @@ export function UsersPage() {
       </header>
 
       {notice && (
-        <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+        <p className="rounded-lg border border-good-200 bg-good-50 p-4 text-sm text-good-800">
           {notice}
         </p>
       )}
 
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           {error}
         </p>
       )}
 
       {isCreating && can('users.manage') && (
-        <section className="rounded-lg border border-slate-200 bg-white p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <section className="rounded-lg border border-ink-200 bg-white p-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
             New staff member
           </h2>
 
@@ -165,8 +165,8 @@ export function UsersPage() {
           </div>
 
           <div className="mt-5">
-            <p className="text-sm font-medium text-slate-700">Roles</p>
-            <p className="text-xs text-slate-500">
+            <p className="text-sm font-medium text-ink-700">Roles</p>
+            <p className="text-xs text-ink-500">
               An account with no role can sign in and do nothing, so at least one is required.
             </p>
 
@@ -177,7 +177,7 @@ export function UsersPage() {
                   className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 transition-colors ${
                     chosenRoles.includes(role.slug)
                       ? 'border-brand-300 bg-brand-50'
-                      : 'border-slate-200 hover:bg-slate-50'
+                      : 'border-ink-200 hover:bg-ink-50'
                   }`}
                 >
                   <input
@@ -187,9 +187,9 @@ export function UsersPage() {
                     className="mt-0.5"
                   />
                   <span>
-                    <span className="block text-sm font-medium text-slate-900">{role.name}</span>
-                    <span className="block text-xs text-slate-500">{role.description}</span>
-                    <span className="mt-1 block text-xs text-slate-400">
+                    <span className="block text-sm font-medium text-ink-900">{role.name}</span>
+                    <span className="block text-xs text-ink-500">{role.description}</span>
+                    <span className="mt-1 block text-xs text-ink-400">
                       {role.permission_count} permissions
                     </span>
                   </span>
@@ -221,9 +221,9 @@ export function UsersPage() {
           <Spinner />
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-ink-200 bg-white">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+            <thead className="border-b border-ink-200 bg-ink-50 text-xs uppercase tracking-wide text-ink-500">
               <tr>
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Roles</th>
@@ -232,19 +232,19 @@ export function UsersPage() {
                 {can('users.manage') && <th className="px-4 py-3" />}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-ink-100">
               {users?.map((staff) => (
-                <tr key={staff.id} className={staff.is_active ? '' : 'bg-slate-50'}>
+                <tr key={staff.id} className={staff.is_active ? '' : 'bg-ink-50'}>
                   <td className="px-4 py-3">
-                    <p className="font-medium text-slate-900">
+                    <p className="font-medium text-ink-900">
                       {staff.full_name}
                       {staff.id === signedIn?.id && (
-                        <span className="ml-2 text-xs font-normal text-slate-400">you</span>
+                        <span className="ml-2 text-xs font-normal text-ink-400">you</span>
                       )}
                     </p>
-                    <p className="text-xs text-slate-500">{staff.email}</p>
+                    <p className="text-xs text-ink-500">{staff.email}</p>
                     {staff.job_title && (
-                      <p className="text-xs text-slate-400">{staff.job_title}</p>
+                      <p className="text-xs text-ink-400">{staff.job_title}</p>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -252,22 +252,22 @@ export function UsersPage() {
                       {staff.roles.map((role) => (
                         <span
                           key={role.slug}
-                          className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700"
+                          className="rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-700"
                         >
                           {role.name}
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-slate-600">
+                  <td className="px-4 py-3 text-ink-600">
                     {staff.last_login_at ? formatDate(staff.last_login_at) : 'Never'}
                   </td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                         staff.is_active
-                          ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200'
-                          : 'bg-slate-200 text-slate-600'
+                          ? 'bg-good-50 text-good-800 ring-1 ring-good-200'
+                          : 'bg-ink-200 text-ink-600'
                       }`}
                     >
                       {staff.is_active ? 'Active' : 'Suspended'}
@@ -289,7 +289,7 @@ export function UsersPage() {
                             ? 'You cannot suspend your own account'
                             : undefined
                         }
-                        className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:opacity-40"
+                        className="rounded-md border border-ink-300 px-3 py-1.5 text-xs font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:opacity-40"
                       >
                         {staff.is_active ? 'Suspend' : 'Reactivate'}
                       </button>

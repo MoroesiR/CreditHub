@@ -73,7 +73,7 @@ export function RecruiterDetailPage() {
 
   if (!recruiter) {
     return (
-      <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
         That recruiter could not be found.
       </p>
     )
@@ -87,21 +87,21 @@ export function RecruiterDetailPage() {
             ← All recruiters
           </Link>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">{recruiter.full_name}</h1>
-          <p className="mt-1 font-mono text-sm text-slate-500">{recruiter.recruiter_number}</p>
+          <p className="mt-1 font-mono text-sm text-ink-500">{recruiter.recruiter_number}</p>
         </div>
         <div className="flex items-center gap-3">
           {can('change-requests.create') && (
             <button
               type="button"
               onClick={() => setRequestingChange(true)}
-              className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+              className="rounded-md border border-ink-300 px-3 py-1.5 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-100"
             >
               Request a change
             </button>
           )}
           <span
             className={`rounded-full px-3 py-1 text-xs font-medium ${
-              recruiter.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
+              recruiter.is_active ? 'bg-good-50 text-good-700' : 'bg-ink-100 text-ink-600'
             }`}
           >
             {recruiter.is_active ? 'Active' : 'Inactive'}
@@ -110,28 +110,28 @@ export function RecruiterDetailPage() {
       </header>
 
       <section className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-sm font-medium text-slate-500">Clients introduced</p>
+        <div className="rounded-lg border border-ink-200 bg-white p-5">
+          <p className="text-sm font-medium text-ink-500">Clients introduced</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight">
             {recruiter.clients_count ?? 0}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-sm font-medium text-slate-500">Contact</p>
-          <p className="mt-2 text-sm text-slate-900">{recruiter.phone}</p>
-          <p className="text-sm text-slate-500">{recruiter.email ?? 'No email'}</p>
+        <div className="rounded-lg border border-ink-200 bg-white p-5">
+          <p className="text-sm font-medium text-ink-500">Contact</p>
+          <p className="mt-2 text-sm text-ink-900">{recruiter.phone}</p>
+          <p className="text-sm text-ink-500">{recruiter.email ?? 'No email'}</p>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-sm font-medium text-slate-500">Commission paid into</p>
+        <div className="rounded-lg border border-ink-200 bg-white p-5">
+          <p className="text-sm font-medium text-ink-500">Commission paid into</p>
           {recruiter.bank_name ? (
             <>
-              <p className="mt-2 text-sm text-slate-900">{recruiter.bank_name}</p>
-              <p className="font-mono text-xs text-slate-500">
+              <p className="mt-2 text-sm text-ink-900">{recruiter.bank_name}</p>
+              <p className="font-mono text-xs text-ink-500">
                 {recruiter.bank_account_number} · branch {recruiter.bank_branch_code}
               </p>
             </>
           ) : (
-            <p className="mt-2 text-sm text-amber-700">
+            <p className="mt-2 text-sm text-warn-700">
               No account captured - commission cannot be paid.
             </p>
           )}
@@ -139,38 +139,38 @@ export function RecruiterDetailPage() {
       </section>
 
       {can('clients.update') && (
-        <section className="rounded-lg border border-slate-200 bg-white p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <section className="rounded-lg border border-ink-200 bg-white p-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
             Credit an earlier introduction
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-ink-500">
             Clients captured as walk-ins. If this recruiter introduced one of them before they were
             registered here, attach them now - otherwise no commission is earned on that loan.
           </p>
 
           {justLinked && (
-            <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+            <p className="mt-4 rounded-md border border-good-200 bg-good-50 p-3 text-sm text-good-800">
               {justLinked}
             </p>
           )}
 
           {linkError && (
-            <p className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <p className="mt-4 rounded-md border border-bad-200 bg-bad-50 p-3 text-sm text-bad-700">
               {linkError}
             </p>
           )}
 
           {!unlinked || unlinked.length === 0 ? (
-            <p className="mt-4 rounded-md border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+            <p className="mt-4 rounded-md border border-dashed border-ink-300 p-6 text-center text-sm text-ink-500">
               Every client on file is already attached to a recruiter.
             </p>
           ) : (
-            <ul className="mt-4 divide-y divide-slate-100">
+            <ul className="mt-4 divide-y divide-ink-100">
               {unlinked.map((client) => (
                 <li key={client.id} className="flex items-center justify-between gap-4 py-3">
                   <div>
-                    <p className="text-sm font-medium text-slate-900">{client.full_name}</p>
-                    <p className="font-mono text-xs text-slate-500">
+                    <p className="text-sm font-medium text-ink-900">{client.full_name}</p>
+                    <p className="font-mono text-xs text-ink-500">
                       {client.client_number} · registered {formatDate(client.created_at)}
                     </p>
                   </div>
@@ -189,34 +189,34 @@ export function RecruiterDetailPage() {
         </section>
       )}
 
-      <section className="rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <section className="rounded-lg border border-ink-200 bg-white p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
           Clients introduced
         </h2>
 
         {!clients || clients.length === 0 ? (
-          <p className="mt-4 rounded-md border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+          <p className="mt-4 rounded-md border border-dashed border-ink-300 p-6 text-center text-sm text-ink-500">
             No introductions credited to this recruiter yet.
           </p>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500">
                 <tr>
                   <th className="py-2 pr-4 font-medium">Client</th>
                   <th className="py-2 pr-4 font-medium">Registered</th>
                   <th className="py-2 text-right font-medium">Disposable income</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-ink-100">
                 {clients.map((client) => (
                   <tr key={client.id}>
                     <td className="py-2 pr-4">
-                      <p className="font-medium text-slate-900">{client.full_name}</p>
-                      <p className="font-mono text-xs text-slate-500">{client.client_number}</p>
+                      <p className="font-medium text-ink-900">{client.full_name}</p>
+                      <p className="font-mono text-xs text-ink-500">{client.client_number}</p>
                     </td>
-                    <td className="py-2 pr-4 text-slate-600">{formatDate(client.created_at)}</td>
-                    <td className="py-2 text-right text-slate-900">
+                    <td className="py-2 pr-4 text-ink-600">{formatDate(client.created_at)}</td>
+                    <td className="py-2 text-right text-ink-900">
                       {client.affordability
                         ? formatMoney(client.affordability.disposable_income)
                         : '-'}
@@ -229,22 +229,22 @@ export function RecruiterDetailPage() {
         )}
       </section>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <section className="rounded-lg border border-ink-200 bg-white p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
           Audit trail
         </h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-ink-500">
           Every change to this recruiter, in order. Entries are never edited or removed.
         </p>
 
         {!trail || trail.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-500">Nothing recorded yet.</p>
+          <p className="mt-4 text-sm text-ink-500">Nothing recorded yet.</p>
         ) : (
           <ol className="mt-4 space-y-3">
             {trail.map((event) => (
-              <li key={event.id} className="border-l-2 border-slate-200 pl-4">
-                <p className="text-sm text-slate-900">{event.summary}</p>
-                <p className="mt-0.5 text-xs text-slate-500">
+              <li key={event.id} className="border-l-2 border-ink-200 pl-4">
+                <p className="text-sm text-ink-900">{event.summary}</p>
+                <p className="mt-0.5 text-xs text-ink-500">
                   {event.actor_name} · {formatDate(event.created_at)}
                   {event.created_at
                     ? ` at ${new Date(event.created_at).toLocaleTimeString('en-ZA')}`

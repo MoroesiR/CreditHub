@@ -3,14 +3,67 @@
 /*
   One palette, defined once. Components reference these tokens rather than raw
   Tailwind colours, so a rebrand is a change to this block and nothing else.
+
+  Three families do the work. Ink is the chrome: the sidebar and anything that
+  frames the page, kept desaturated so the data carries the colour. Brand is
+  reserved for what the user can act on, so a blue control is always a control
+  and never decoration. The semantic four carry meaning about money and are
+  used for nothing else, which is what lets a queue be read by colour alone.
 */
 @theme {
-  --color-brand-50: oklch(0.97 0.02 240);
-  --color-brand-100: oklch(0.93 0.04 240);
-  --color-brand-500: oklch(0.58 0.15 250);
-  --color-brand-600: oklch(0.51 0.16 252);
-  --color-brand-700: oklch(0.43 0.15 254);
-  --color-brand-900: oklch(0.27 0.09 256);
+  --color-ink-50: oklch(0.97 0.005 250);
+  --color-ink-100: oklch(0.93 0.008 250);
+  --color-ink-200: oklch(0.87 0.012 250);
+  --color-ink-300: oklch(0.72 0.016 250);
+  --color-ink-400: oklch(0.58 0.02 250);
+  --color-ink-500: oklch(0.46 0.025 252);
+  --color-ink-600: oklch(0.38 0.03 254);
+  --color-ink-700: oklch(0.3 0.035 256);
+  --color-ink-800: oklch(0.24 0.035 258);
+  --color-ink-900: oklch(0.19 0.03 258);
+  --color-ink-950: oklch(0.14 0.025 260);
+
+  --color-brand-50: oklch(0.97 0.02 232);
+  --color-brand-100: oklch(0.93 0.045 232);
+  --color-brand-200: oklch(0.86 0.075 232);
+  --color-brand-300: oklch(0.77 0.105 234);
+  --color-brand-400: oklch(0.68 0.13 236);
+  --color-brand-500: oklch(0.6 0.145 238);
+  --color-brand-600: oklch(0.53 0.15 240);
+  --color-brand-700: oklch(0.45 0.135 242);
+  --color-brand-800: oklch(0.37 0.11 244);
+  --color-brand-900: oklch(0.29 0.08 246);
+
+  /* Settled, or a stage cleared. */
+  --color-good-50: oklch(0.96 0.03 160);
+  --color-good-100: oklch(0.91 0.06 162);
+  --color-good-200: oklch(0.84 0.09 163);
+  --color-good-600: oklch(0.56 0.13 163);
+  --color-good-700: oklch(0.47 0.11 164);
+  --color-good-800: oklch(0.38 0.09 165);
+
+  /* Waiting on somebody. */
+  --color-warn-50: oklch(0.97 0.035 85);
+  --color-warn-100: oklch(0.93 0.07 85);
+  --color-warn-200: oklch(0.87 0.11 84);
+  --color-warn-600: oklch(0.66 0.15 70);
+  --color-warn-700: oklch(0.55 0.13 62);
+  --color-warn-800: oklch(0.44 0.1 58);
+
+  /* Stopped, refused, or in arrears. */
+  --color-bad-50: oklch(0.96 0.02 20);
+  --color-bad-100: oklch(0.92 0.045 20);
+  --color-bad-200: oklch(0.85 0.075 20);
+  --color-bad-600: oklch(0.57 0.19 22);
+  --color-bad-700: oklch(0.48 0.17 24);
+  --color-bad-800: oklch(0.4 0.14 25);
+
+  /* Moving, but not yet money. */
+  --color-info-50: oklch(0.96 0.025 220);
+  --color-info-100: oklch(0.92 0.05 220);
+  --color-info-200: oklch(0.85 0.08 220);
+  --color-info-700: oklch(0.48 0.12 232);
+  --color-info-800: oklch(0.4 0.1 234);
 }
 
 html,
@@ -20,5 +73,13 @@ body,
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-ink-50 text-ink-900 antialiased;
+}
+
+/*
+  Amounts are compared down a column, so they line up on the digit rather than
+  drifting with the typeface's proportional widths.
+*/
+.tabular {
+  font-variant-numeric: tabular-nums;
 }

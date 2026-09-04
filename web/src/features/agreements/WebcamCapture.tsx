@@ -79,7 +79,7 @@ export function WebcamCapture({
         <img
           src={photo}
           alt="Captured at signing"
-          className="w-full rounded-md border border-slate-300"
+          className="w-full rounded-md border border-ink-300"
         />
         <button
           type="button"
@@ -87,7 +87,7 @@ export function WebcamCapture({
             onChange(null)
             void start()
           }}
-          className="mt-2 text-xs font-medium text-slate-500 hover:text-brand-700"
+          className="mt-2 text-xs font-medium text-ink-500 hover:text-brand-700"
         >
           Retake
         </button>
@@ -97,7 +97,7 @@ export function WebcamCapture({
 
   return (
     <div>
-      <div className="relative overflow-hidden rounded-md border border-slate-300 bg-slate-900">
+      <div className="relative overflow-hidden rounded-md border border-ink-300 bg-ink-900">
         <video
           ref={videoRef}
           playsInline
@@ -107,14 +107,14 @@ export function WebcamCapture({
 
         {!isLive && (
           <div className="flex aspect-[4/3] w-full items-center justify-center">
-            <p className="px-4 text-center text-sm text-slate-400">
+            <p className="px-4 text-center text-sm text-ink-400">
               The camera is off. Nothing is recorded until you start it.
             </p>
           </div>
         )}
       </div>
 
-      {error && <p className="mt-2 text-xs text-amber-700">{error}</p>}
+      {error && <p className="mt-2 text-xs text-warn-700">{error}</p>}
 
       <div className="mt-2 flex gap-2">
         {isLive ? (
@@ -129,7 +129,7 @@ export function WebcamCapture({
             <button
               type="button"
               onClick={stop}
-              className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              className="rounded-md border border-ink-300 px-3 py-1.5 text-sm font-medium text-ink-700 hover:bg-ink-100"
             >
               Turn camera off
             </button>
@@ -138,7 +138,7 @@ export function WebcamCapture({
           <button
             type="button"
             onClick={() => void start()}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            className="rounded-md border border-ink-300 px-3 py-1.5 text-sm font-medium text-ink-700 hover:bg-ink-100"
           >
             Start camera
           </button>

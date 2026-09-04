@@ -122,16 +122,16 @@ export function SignaturePad({
         onPointerMove={move}
         onPointerUp={end}
         onPointerLeave={end}
-        className="h-40 w-full cursor-crosshair touch-none rounded-md border border-slate-300 bg-white"
+        className="h-40 w-full cursor-crosshair touch-none rounded-md border border-ink-300 bg-white"
       />
       <div className="mt-2 flex items-center justify-between">
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-ink-500">
           {hasInk ? 'Signed.' : 'The client signs here, using a finger, stylus or mouse.'}
         </p>
         <button
           type="button"
           onClick={clear}
-          className="text-xs font-medium text-slate-500 hover:text-red-600"
+          className="text-xs font-medium text-ink-500 hover:text-bad-600"
         >
           Clear
         </button>

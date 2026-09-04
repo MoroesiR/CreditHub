@@ -106,14 +106,14 @@ export function CreateApplicationPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Create loan application</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-ink-500">
           The application number is issued on submission and the file goes to a credit manager for
           a decision.
         </p>
       </header>
 
       {submitError && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           {submitError}
         </p>
       )}
@@ -164,16 +164,16 @@ export function CreateApplicationPage() {
             value={quote ? `${quote.interest_rate}% a year` : ''}
             readOnly
             placeholder="-"
-            className={`${inputClass} bg-slate-50 text-slate-600`}
+            className={`${inputClass} bg-ink-50 text-ink-600`}
           />
         </Field>
       </Section>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <section className="rounded-lg border border-ink-200 bg-white p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
           Supporting documents
         </h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-ink-500">
           All three are required. The file cannot be submitted without them, and it cannot be
           defended later without them either.
         </p>
@@ -195,30 +195,30 @@ export function CreateApplicationPage() {
       <section
         className={`rounded-lg border p-6 ${
           affordable === false
-            ? 'border-red-200 bg-red-50'
+            ? 'border-bad-200 bg-bad-50'
             : affordable === true
-              ? 'border-emerald-200 bg-emerald-50'
-              : 'border-slate-200 bg-white'
+              ? 'border-good-200 bg-good-50'
+              : 'border-ink-200 bg-white'
         }`}
       >
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Quote</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Quote</h2>
 
         <dl className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>
-            <dt className="text-sm text-slate-500">Monthly instalment</dt>
-            <dd className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            <dt className="text-sm text-ink-500">Monthly instalment</dt>
+            <dd className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
               {quote ? formatMoney(quote.monthly_instalment) : '-'}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-slate-500">Total repayable</dt>
-            <dd className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            <dt className="text-sm text-ink-500">Total repayable</dt>
+            <dd className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
               {quote ? formatMoney(quote.total_repayable) : '-'}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-slate-500">Cost of credit</dt>
-            <dd className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            <dt className="text-sm text-ink-500">Cost of credit</dt>
+            <dd className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
               {quote ? formatMoney(quote.total_interest) : '-'}
             </dd>
           </div>
@@ -227,15 +227,15 @@ export function CreateApplicationPage() {
         {client && (
           <p className="mt-4 text-sm">
             {disposable === null ? (
-              <span className="text-amber-800">
+              <span className="text-warn-800">
                 This client has no affordability assessment, so no application can be made.
               </span>
             ) : affordable ? (
-              <span className="text-emerald-800">
+              <span className="text-good-800">
                 Fits within {formatMoney(disposable)} of disposable income.
               </span>
             ) : (
-              <span className="text-red-700">
+              <span className="text-bad-700">
                 The instalment exceeds {formatMoney(disposable)} of disposable income. Reduce the
                 amount or lengthen the term.
               </span>
@@ -246,7 +246,7 @@ export function CreateApplicationPage() {
 
       <div className="flex flex-wrap items-center justify-end gap-3">
         {!canSubmit && (
-          <p className="mr-auto text-sm text-slate-500">
+          <p className="mr-auto text-sm text-ink-500">
             {!client
               ? 'Select a client to continue.'
               : affordable === false
@@ -260,7 +260,7 @@ export function CreateApplicationPage() {
         <button
           type="button"
           onClick={() => void navigate('/applications')}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+          className="rounded-md border border-ink-300 px-4 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-100"
         >
           Cancel
         </button>

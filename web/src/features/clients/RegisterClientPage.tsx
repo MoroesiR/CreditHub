@@ -149,14 +149,14 @@ export function RegisterClientPage() {
     <form onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Register client</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-ink-500">
           The client number is issued on save and stays with this borrower for every loan they
           subsequently take.
         </p>
       </header>
 
       {submitError && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           {submitError}
         </p>
       )}
@@ -187,7 +187,7 @@ export function RegisterClientPage() {
               value={identity ? formatDate(identity.dateOfBirth.toISOString()) : ''}
               readOnly
               placeholder="-"
-              className={`${inputClass} bg-slate-50 text-slate-600`}
+              className={`${inputClass} bg-ink-50 text-ink-600`}
             />
           </Field>
           <Field label="Age">
@@ -195,7 +195,7 @@ export function RegisterClientPage() {
               value={identity ? `${identity.age}` : ''}
               readOnly
               placeholder="-"
-              className={`${inputClass} bg-slate-50 text-slate-600`}
+              className={`${inputClass} bg-ink-50 text-ink-600`}
             />
           </Field>
           <Field label="Gender">
@@ -203,7 +203,7 @@ export function RegisterClientPage() {
               value={identity ? (identity.gender === 'female' ? 'Female' : 'Male') : ''}
               readOnly
               placeholder="-"
-              className={`${inputClass} bg-slate-50 capitalize text-slate-600`}
+              className={`${inputClass} bg-ink-50 capitalize text-ink-600`}
             />
           </Field>
         </div>
@@ -230,7 +230,7 @@ export function RegisterClientPage() {
           <input
             value={locations?.country ?? 'South Africa'}
             readOnly
-            className={`${inputClass} bg-slate-50 text-slate-600`}
+            className={`${inputClass} bg-ink-50 text-ink-600`}
           />
         </Field>
       </Section>
@@ -280,7 +280,7 @@ export function RegisterClientPage() {
             value={selectedBranchCode}
             readOnly
             placeholder="-"
-            className={`${inputClass} bg-slate-50 text-slate-500`}
+            className={`${inputClass} bg-ink-50 text-ink-500`}
           />
         </Field>
       </Section>
@@ -397,14 +397,14 @@ export function RegisterClientPage() {
         <div className="sm:col-span-2">
           <div
             className={`rounded-md border p-4 ${
-              disposable > 0 ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'
+              disposable > 0 ? 'border-good-200 bg-good-50' : 'border-warn-200 bg-warn-50'
             }`}
           >
-            <p className="text-sm font-medium text-slate-700">Disposable income</p>
-            <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            <p className="text-sm font-medium text-ink-700">Disposable income</p>
+            <p className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
               {formatMoney(disposable)}
             </p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-ink-600">
               {disposable > 0
                 ? 'Net income less living expenses and existing debt repayments.'
                 : 'This client has nothing left each month. A loan would not be affordable.'}
@@ -417,7 +417,7 @@ export function RegisterClientPage() {
         <button
           type="button"
           onClick={() => void navigate('/clients')}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+          className="rounded-md border border-ink-300 px-4 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-100"
         >
           Cancel
         </button>

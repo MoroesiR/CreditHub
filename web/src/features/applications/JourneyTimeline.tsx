@@ -19,37 +19,37 @@ export function JourneyTimeline({ stages }: { stages: JourneyStage[] }) {
               <span
                 aria-hidden="true"
                 className={`absolute left-[7px] top-5 h-full w-px ${
-                  stage.done ? 'bg-brand-300' : 'bg-slate-200'
+                  stage.done ? 'bg-brand-300' : 'bg-ink-200'
                 }`}
               />
             )}
 
             <span
               className={`relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full ring-4 ring-white ${
-                stage.done ? 'bg-brand-600' : 'border border-slate-300 bg-slate-100'
+                stage.done ? 'bg-brand-600' : 'border border-ink-300 bg-ink-100'
               }`}
             />
 
             <div className="min-w-0 flex-1">
               <p
                 className={`text-sm font-medium ${
-                  stage.done ? 'text-slate-900' : 'text-slate-400'
+                  stage.done ? 'text-ink-900' : 'text-ink-400'
                 }`}
               >
                 {stage.label}
               </p>
 
               {stage.done ? (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-ink-500">
                   {stage.actor ?? 'Unrecorded'}
                   {stage.at ? ` · ${formatDate(stage.at)}` : ''}
                 </p>
               ) : (
-                <p className="text-xs text-slate-400">Not yet</p>
+                <p className="text-xs text-ink-400">Not yet</p>
               )}
 
               {stage.detail && (
-                <p className={`text-xs ${stage.done ? 'text-slate-600' : 'text-slate-400'}`}>
+                <p className={`text-xs ${stage.done ? 'text-ink-600' : 'text-ink-400'}`}>
                   {stage.detail}
                 </p>
               )}

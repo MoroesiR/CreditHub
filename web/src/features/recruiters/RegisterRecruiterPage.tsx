@@ -113,14 +113,14 @@ export function RegisterRecruiterPage() {
     <form onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Register recruiter</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-ink-500">
           Recruiters introduce borrowers and earn commission on the loans that result. They are not
           staff and never sign in.
         </p>
       </header>
 
       {submitError && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           {submitError}
         </p>
       )}
@@ -155,7 +155,7 @@ export function RegisterRecruiterPage() {
             }
             readOnly
             placeholder="-"
-            className={`${inputClass} bg-slate-50 text-slate-600`}
+            className={`${inputClass} bg-ink-50 text-ink-600`}
           />
         </Field>
         <Field label="Phone" error={errors.phone?.message}>
@@ -188,7 +188,7 @@ export function RegisterRecruiterPage() {
             value={branchCode}
             readOnly
             placeholder="-"
-            className={`${inputClass} bg-slate-50 text-slate-500`}
+            className={`${inputClass} bg-ink-50 text-ink-500`}
           />
         </Field>
       </Section>
@@ -197,7 +197,7 @@ export function RegisterRecruiterPage() {
         <button
           type="button"
           onClick={() => void navigate('/recruiters')}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+          className="rounded-md border border-ink-300 px-4 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-100"
         >
           Cancel
         </button>

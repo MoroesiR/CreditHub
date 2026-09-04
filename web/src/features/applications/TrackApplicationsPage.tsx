@@ -48,7 +48,7 @@ function StageCell({
     // Declined files stop after the decision, and walk-ins never reach a
     // commission stage, so a missing stage means "not on this file's route".
     return (
-      <td className="px-4 py-3 text-slate-300" title="Not part of this file's route">
+      <td className="px-4 py-3 text-ink-300" title="Not part of this file's route">
         n/a
       </td>
     )
@@ -57,16 +57,16 @@ function StageCell({
   if (!stage.done) {
     return (
       <td className="px-4 py-3">
-        <span className="text-xs text-amber-700">Pending</span>
+        <span className="text-xs text-warn-700">Pending</span>
       </td>
     )
   }
 
   return (
     <td className="px-4 py-3">
-      <p className="text-slate-900">{stage.actor ?? 'Unrecorded'}</p>
-      <p className="text-xs text-slate-500">{stage.at ? formatDateTime(stage.at) : ''}</p>
-      {stage.detail && <p className="text-xs text-slate-400">{stage.detail}</p>}
+      <p className="text-ink-900">{stage.actor ?? 'Unrecorded'}</p>
+      <p className="text-xs text-ink-500">{stage.at ? formatDateTime(stage.at) : ''}</p>
+      {stage.detail && <p className="text-xs text-ink-400">{stage.detail}</p>}
     </td>
   )
 }
@@ -98,7 +98,7 @@ export function TrackApplicationsPage() {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Track loan applications</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-ink-500">
             Every application and where it has reached. Search by application number, client name,
             client number or ID number.
           </p>
@@ -120,7 +120,7 @@ export function TrackApplicationsPage() {
           value={term}
           onChange={(event) => setTerm(event.target.value)}
           placeholder="Search applications…"
-          className="w-full max-w-md rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          className="w-full max-w-md rounded-md border border-ink-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
         />
 
         <div className="flex flex-wrap gap-1">
@@ -135,7 +135,7 @@ export function TrackApplicationsPage() {
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 status === filter.value
                   ? 'bg-brand-50 text-brand-700'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  : 'text-ink-600 hover:bg-ink-100'
               }`}
             >
               {filter.label}
@@ -149,18 +149,18 @@ export function TrackApplicationsPage() {
           <Spinner />
         </div>
       ) : isError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           Applications could not be loaded.
         </p>
       ) : data.data.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+        <p className="rounded-lg border border-dashed border-ink-300 bg-white p-8 text-center text-sm text-ink-500">
           No applications match this view.
         </p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-ink-200 bg-white">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-ink-200 bg-ink-50 text-xs uppercase tracking-wide text-ink-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Application</th>
                   <th className="px-4 py-3 font-medium">Client</th>
@@ -170,7 +170,7 @@ export function TrackApplicationsPage() {
                     <th key={column.key} className="px-4 py-3 font-medium">
                       {column.role}
                       <br />
-                      <small className="font-normal normal-case text-slate-400">
+                      <small className="font-normal normal-case text-ink-400">
                         {column.step}
                       </small>
                     </th>
@@ -178,9 +178,9 @@ export function TrackApplicationsPage() {
                   <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-ink-100">
                 {data.data.map((application) => (
-                  <tr key={application.id} className="hover:bg-slate-50">
+                  <tr key={application.id} className="hover:bg-ink-50">
                     <td className="px-4 py-3">
                       <Link
                         to={`/applications/${application.id}`}
@@ -188,22 +188,22 @@ export function TrackApplicationsPage() {
                       >
                         {application.application_number}
                       </Link>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-ink-500">
                         {application.term_months} months @ {application.interest_rate}%
                       </p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-ink-900">
                         {application.client?.full_name ?? '-'}
                       </p>
-                      <p className="font-mono text-xs text-slate-500">
+                      <p className="font-mono text-xs text-ink-500">
                         {application.client?.client_number}
                       </p>
                     </td>
-                    <td className="px-4 py-3 text-right font-medium text-slate-900">
+                    <td className="px-4 py-3 text-right font-medium text-ink-900">
                       {formatMoney(application.amount)}
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-700">
+                    <td className="px-4 py-3 text-right text-ink-700">
                       {formatMoney(application.monthly_instalment)}
                     </td>
                     {CUSTODY_COLUMNS.map((column) => (
@@ -225,7 +225,7 @@ export function TrackApplicationsPage() {
             </table>
           </div>
 
-          <div className="flex items-center justify-between text-sm text-slate-500">
+          <div className="flex items-center justify-between text-sm text-ink-500">
             <p>
               Showing {data.meta.from ?? 0}–{data.meta.to ?? 0} of {data.meta.total}
             </p>
@@ -234,7 +234,7 @@ export function TrackApplicationsPage() {
                 type="button"
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                 disabled={data.meta.current_page <= 1}
-                className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:opacity-50"
+                className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
               >
                 Previous
               </button>
@@ -242,7 +242,7 @@ export function TrackApplicationsPage() {
                 type="button"
                 onClick={() => setPage((current) => current + 1)}
                 disabled={data.meta.current_page >= data.meta.last_page}
-                className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:opacity-50"
+                className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
               >
                 Next
               </button>

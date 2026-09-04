@@ -32,7 +32,7 @@ export function RecruiterSearchPage() {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Recruiters</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-ink-500">
             Search by name, recruiter number, ID number or phone.
           </p>
         </div>
@@ -52,7 +52,7 @@ export function RecruiterSearchPage() {
         value={term}
         onChange={(event) => setTerm(event.target.value)}
         placeholder="Search recruiters…"
-        className="w-full max-w-md rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+        className="w-full max-w-md rounded-md border border-ink-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
       />
 
       {isPending ? (
@@ -60,18 +60,18 @@ export function RecruiterSearchPage() {
           <Spinner />
         </div>
       ) : isError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           Recruiters could not be loaded.
         </p>
       ) : data.data.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+        <p className="rounded-lg border border-dashed border-ink-300 bg-white p-8 text-center text-sm text-ink-500">
           {search ? `No recruiter matches “${search}”.` : 'No recruiters registered yet.'}
         </p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-ink-200 bg-white">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-ink-200 bg-ink-50 text-xs uppercase tracking-wide text-ink-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Recruiter</th>
                   <th className="px-4 py-3 font-medium">ID number</th>
@@ -80,9 +80,9 @@ export function RecruiterSearchPage() {
                   <th className="px-4 py-3 text-right font-medium">Clients introduced</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-ink-100">
                 {data.data.map((recruiter) => (
-                  <tr key={recruiter.id} className="hover:bg-slate-50">
+                  <tr key={recruiter.id} className="hover:bg-ink-50">
                     <td className="px-4 py-3">
                       <Link
                         to={`/recruiters/${recruiter.id}`}
@@ -90,18 +90,18 @@ export function RecruiterSearchPage() {
                       >
                         {recruiter.full_name}
                       </Link>
-                      <p className="font-mono text-xs text-slate-500">
+                      <p className="font-mono text-xs text-ink-500">
                         {recruiter.recruiter_number}
                       </p>
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-600">
+                    <td className="px-4 py-3 font-mono text-xs text-ink-600">
                       {recruiter.id_number}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{recruiter.phone}</td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {recruiter.bank_name ?? <span className="text-slate-400">Not captured</span>}
+                    <td className="px-4 py-3 text-ink-600">{recruiter.phone}</td>
+                    <td className="px-4 py-3 text-ink-600">
+                      {recruiter.bank_name ?? <span className="text-ink-400">Not captured</span>}
                     </td>
-                    <td className="px-4 py-3 text-right font-medium text-slate-900">
+                    <td className="px-4 py-3 text-right font-medium text-ink-900">
                       {recruiter.clients_count ?? 0}
                     </td>
                   </tr>
@@ -110,7 +110,7 @@ export function RecruiterSearchPage() {
             </table>
           </div>
 
-          <div className="flex items-center justify-between text-sm text-slate-500">
+          <div className="flex items-center justify-between text-sm text-ink-500">
             <p>
               Showing {data.meta.from ?? 0}–{data.meta.to ?? 0} of {data.meta.total}
             </p>
@@ -119,7 +119,7 @@ export function RecruiterSearchPage() {
                 type="button"
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                 disabled={data.meta.current_page <= 1}
-                className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:opacity-50"
+                className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
               >
                 Previous
               </button>
@@ -127,7 +127,7 @@ export function RecruiterSearchPage() {
                 type="button"
                 onClick={() => setPage((current) => current + 1)}
                 disabled={data.meta.current_page >= data.meta.last_page}
-                className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:opacity-50"
+                className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
               >
                 Next
               </button>

@@ -23,10 +23,10 @@ const FILTERS: { value: DisbursementStatus | ''; label: string }[] = [
 ]
 
 const STATUS_STYLES: Record<DisbursementStatus, string> = {
-  pending: 'bg-amber-50 text-amber-800 ring-1 ring-amber-200',
-  verified: 'bg-sky-50 text-sky-800 ring-1 ring-sky-200',
-  paid: 'bg-emerald-600 text-white',
-  on_hold: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+  pending: 'bg-warn-50 text-warn-800 ring-1 ring-warn-200',
+  verified: 'bg-info-50 text-info-800 ring-1 ring-info-200',
+  paid: 'bg-good-600 text-white',
+  on_hold: 'bg-bad-50 text-bad-700 ring-1 ring-bad-200',
 }
 
 export function DisbursementQueuePage() {
@@ -100,20 +100,20 @@ export function DisbursementQueuePage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Disbursements</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-ink-500">
           Signed loans waiting to be paid. Verification and payment are two separate acts, and both
           are recorded against whoever performed them.
         </p>
       </header>
 
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           {error}
         </p>
       )}
 
       {notice && (
-        <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+        <p className="rounded-lg border border-good-200 bg-good-50 p-4 text-sm text-good-800">
           {notice}
         </p>
       )}
@@ -130,7 +130,7 @@ export function DisbursementQueuePage() {
             className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               status === filter.value
                 ? 'bg-brand-50 text-brand-700'
-                : 'text-slate-600 hover:bg-slate-100'
+                : 'text-ink-600 hover:bg-ink-100'
             }`}
           >
             {filter.label}
@@ -143,17 +143,17 @@ export function DisbursementQueuePage() {
           <Spinner />
         </div>
       ) : isError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           The queue could not be loaded.
         </p>
       ) : data.data.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+        <p className="rounded-lg border border-dashed border-ink-300 bg-white p-8 text-center text-sm text-ink-500">
           Nothing in this view.
         </p>
       ) : (
         <ul className="space-y-3">
           {data.data.map((item) => (
-            <li key={item.id} className="rounded-lg border border-slate-200 bg-white p-5">
+            <li key={item.id} className="rounded-lg border border-ink-200 bg-white p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-3">
@@ -169,10 +169,10 @@ export function DisbursementQueuePage() {
                       {item.status_label}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm font-medium text-slate-900">
+                  <p className="mt-1 text-sm font-medium text-ink-900">
                     {item.application?.client?.full_name}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-ink-500">
                     Signed {formatDate(item.created_at)}
                     {item.application?.recruiter
                       ? ` · introduced by ${item.application.recruiter.full_name}`
@@ -180,11 +180,11 @@ export function DisbursementQueuePage() {
                   </p>
 
                   {item.hold_reason && (
-                    <p className="mt-2 text-sm text-red-700">On hold: {item.hold_reason}</p>
+                    <p className="mt-2 text-sm text-bad-700">On hold: {item.hold_reason}</p>
                   )}
 
                   {item.status === 'paid' && (
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-ink-500">
                       Paid {formatDate(item.paid_at)} by {item.paid_by} · reference{' '}
                       <span className="font-mono">{item.payment_reference}</span> · to{' '}
                       {item.paid_to_bank_name} {item.paid_to_account_number}
@@ -192,14 +192,14 @@ export function DisbursementQueuePage() {
                   )}
 
                   {item.verified_at && item.status !== 'paid' && (
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-ink-500">
                       Verified {formatDate(item.verified_at)} by {item.verified_by}
                     </p>
                   )}
                 </div>
 
                 <div className="text-right">
-                  <p className="text-2xl font-semibold tracking-tight text-slate-900">
+                  <p className="text-2xl font-semibold tracking-tight text-ink-900">
                     {formatMoney(item.amount)}
                   </p>
 
@@ -210,7 +210,7 @@ export function DisbursementQueuePage() {
                           type="button"
                           onClick={() => verify.mutate(item.id)}
                           disabled={verify.isPending}
-                          className="rounded-md bg-sky-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-700 disabled:opacity-60"
+                          className="rounded-md bg-info-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-info-700 disabled:opacity-60"
                         >
                           Verify
                         </button>
@@ -223,7 +223,7 @@ export function DisbursementQueuePage() {
                           setPaying(item)
                           setError(null)
                         }}
-                        className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+                        className="rounded-md bg-good-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-good-700"
                       >
                         Pay
                       </button>
@@ -236,7 +236,7 @@ export function DisbursementQueuePage() {
                           setHolding(item)
                           setError(null)
                         }}
-                        className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                        className="rounded-md border border-ink-300 px-3 py-1.5 text-sm font-medium text-ink-700 hover:bg-ink-100"
                       >
                         Hold
                       </button>
@@ -246,19 +246,19 @@ export function DisbursementQueuePage() {
               </div>
 
               {paying?.id === item.id && (
-                <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-4">
+                <div className="mt-4 rounded-md border border-good-200 bg-good-50 p-4">
                   <label className="block">
-                    <span className="text-sm font-medium text-emerald-900">
+                    <span className="text-sm font-medium text-good-900">
                       Bank reference for this transfer
                     </span>
                     <input
                       value={reference}
                       onChange={(event) => setReference(event.target.value)}
                       placeholder="e.g. EFT-20260902-0001"
-                      className="mt-1 w-full max-w-sm rounded-md border border-emerald-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-500"
+                      className="mt-1 w-full max-w-sm rounded-md border border-good-300 bg-white px-3 py-2 text-sm outline-none focus:border-good-500"
                     />
                   </label>
-                  <p className="mt-1 text-xs text-emerald-800">
+                  <p className="mt-1 text-xs text-good-800">
                     Without it, a payment here cannot be tied to one on a bank statement.
                   </p>
                   <div className="mt-3 flex gap-2">
@@ -266,14 +266,14 @@ export function DisbursementQueuePage() {
                       type="button"
                       onClick={() => pay.mutate({ id: item.id, ref: reference })}
                       disabled={reference.trim().length === 0 || pay.isPending}
-                      className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+                      className="rounded-md bg-good-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-good-700 disabled:opacity-60"
                     >
                       {pay.isPending ? 'Releasing…' : `Release ${formatMoney(item.amount)}`}
                     </button>
                     <button
                       type="button"
                       onClick={() => setPaying(null)}
-                      className="rounded-md border border-emerald-300 px-3 py-1.5 text-sm font-medium text-emerald-900 hover:bg-emerald-100"
+                      className="rounded-md border border-good-300 px-3 py-1.5 text-sm font-medium text-good-900 hover:bg-good-100"
                     >
                       Cancel
                     </button>
@@ -282,13 +282,13 @@ export function DisbursementQueuePage() {
               )}
 
               {holding?.id === item.id && (
-                <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-4">
+                <div className="mt-4 rounded-md border border-bad-200 bg-bad-50 p-4">
                   <label className="block">
-                    <span className="text-sm font-medium text-red-900">Why is this on hold?</span>
+                    <span className="text-sm font-medium text-bad-900">Why is this on hold?</span>
                     <input
                       value={holdReason}
                       onChange={(event) => setHoldReason(event.target.value)}
-                      className="mt-1 w-full max-w-sm rounded-md border border-red-300 bg-white px-3 py-2 text-sm outline-none focus:border-red-500"
+                      className="mt-1 w-full max-w-sm rounded-md border border-bad-300 bg-white px-3 py-2 text-sm outline-none focus:border-bad-500"
                     />
                   </label>
                   <div className="mt-3 flex gap-2">
@@ -296,14 +296,14 @@ export function DisbursementQueuePage() {
                       type="button"
                       onClick={() => hold.mutate({ id: item.id, reason: holdReason })}
                       disabled={holdReason.trim().length === 0 || hold.isPending}
-                      className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                      className="rounded-md bg-bad-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-bad-700 disabled:opacity-60"
                     >
                       Put on hold
                     </button>
                     <button
                       type="button"
                       onClick={() => setHolding(null)}
-                      className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-900 hover:bg-red-100"
+                      className="rounded-md border border-bad-300 px-3 py-1.5 text-sm font-medium text-bad-900 hover:bg-bad-100"
                     >
                       Cancel
                     </button>
@@ -316,7 +316,7 @@ export function DisbursementQueuePage() {
       )}
 
       {data && data.meta.last_page > 1 && (
-        <div className="flex items-center justify-between text-sm text-slate-500">
+        <div className="flex items-center justify-between text-sm text-ink-500">
           <p>
             Showing {data.meta.from ?? 0}–{data.meta.to ?? 0} of {data.meta.total}
           </p>
@@ -325,7 +325,7 @@ export function DisbursementQueuePage() {
               type="button"
               onClick={() => setPage((current) => Math.max(1, current - 1))}
               disabled={data.meta.current_page <= 1}
-              className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+              className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 hover:bg-ink-100 disabled:opacity-50"
             >
               Previous
             </button>
@@ -333,7 +333,7 @@ export function DisbursementQueuePage() {
               type="button"
               onClick={() => setPage((current) => current + 1)}
               disabled={data.meta.current_page >= data.meta.last_page}
-              className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+              className="rounded-md border border-ink-300 px-3 py-1.5 font-medium text-ink-700 hover:bg-ink-100 disabled:opacity-50"
             >
               Next
             </button>

@@ -19,9 +19,9 @@ export function RequirePermission({
 
   if (!can(permission)) {
     return (
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-6">
-        <h1 className="text-lg font-semibold text-amber-900">Not available to your role</h1>
-        <p className="mt-1 text-sm text-amber-800">
+      <div className="rounded-lg border border-warn-200 bg-warn-50 p-6">
+        <h1 className="text-lg font-semibold text-warn-900">Not available to your role</h1>
+        <p className="mt-1 text-sm text-warn-800">
           This screen requires the <code className="font-mono">{permission}</code> permission.
         </p>
       </div>

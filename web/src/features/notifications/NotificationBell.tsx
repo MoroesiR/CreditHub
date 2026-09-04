@@ -59,7 +59,7 @@ export function NotificationBell() {
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-label={unread > 0 ? `${unread} unread notifications` : 'Notifications'}
-        className="relative rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+        className="relative rounded-md p-2 text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900"
       >
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
@@ -71,16 +71,16 @@ export function NotificationBell() {
         </svg>
 
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-medium text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-bad-600 px-1 text-xs font-medium text-white">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-30 mt-1 w-96 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
-            <p className="text-sm font-medium text-slate-900">Notifications</p>
+        <div className="absolute right-0 z-30 mt-1 w-96 overflow-hidden rounded-lg border border-ink-200 bg-white shadow-lg">
+          <div className="flex items-center justify-between border-b border-ink-100 px-4 py-2">
+            <p className="text-sm font-medium text-ink-900">Notifications</p>
             {unread > 0 && (
               <button
                 type="button"
@@ -93,9 +93,9 @@ export function NotificationBell() {
           </div>
 
           {!data || data.data.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-slate-500">Nothing yet.</p>
+            <p className="px-4 py-6 text-center text-sm text-ink-500">Nothing yet.</p>
           ) : (
-            <ul className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
+            <ul className="max-h-96 divide-y divide-ink-100 overflow-y-auto">
               {data.data.map((notification) => (
                 <li key={notification.id}>
                   <button
@@ -108,7 +108,7 @@ export function NotificationBell() {
                       setIsOpen(false)
                       void navigate(notification.action_url)
                     }}
-                    className={`w-full px-4 py-3 text-left transition-colors hover:bg-slate-50 ${
+                    className={`w-full px-4 py-3 text-left transition-colors hover:bg-ink-50 ${
                       notification.read_at ? '' : 'bg-brand-50/40'
                     }`}
                   >
@@ -118,18 +118,18 @@ export function NotificationBell() {
                           notification.read_at
                             ? 'bg-transparent'
                             : notification.approved === false
-                              ? 'bg-red-500'
-                              : 'bg-emerald-500'
+                              ? 'bg-bad-500'
+                              : 'bg-good-500'
                         }`}
                       />
                       <span>
-                        <span className="block text-sm font-medium text-slate-900">
+                        <span className="block text-sm font-medium text-ink-900">
                           {notification.title}
                         </span>
-                        <span className="mt-0.5 block text-sm text-slate-600">
+                        <span className="mt-0.5 block text-sm text-ink-600">
                           {notification.body}
                         </span>
-                        <span className="mt-1 block text-xs text-slate-400">
+                        <span className="mt-1 block text-xs text-ink-400">
                           {formatDate(notification.created_at)}
                         </span>
                       </span>

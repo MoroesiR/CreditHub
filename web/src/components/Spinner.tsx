@@ -8,7 +8,7 @@ export function Spinner({ label = 'Loading' }: { label?: string }) {
 
 export function FullPageSpinner() {
   return (
-    <div className="flex h-full items-center justify-center text-slate-400">
+    <div className="flex h-full items-center justify-center text-ink-400">
       <Spinner label="Loading CreditHub" />
     </div>
   )

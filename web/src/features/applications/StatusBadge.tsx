@@ -5,13 +5,13 @@ import type { ApplicationStatus } from '@/types/applications'
  * someone, emerald has cleared a gate, red has stopped.
  */
 const STYLES: Record<ApplicationStatus, string> = {
-  draft: 'bg-slate-100 text-slate-700',
-  submitted: 'bg-amber-50 text-amber-800 ring-1 ring-amber-200',
-  approved: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200',
-  declined: 'bg-red-50 text-red-700 ring-1 ring-red-200',
-  agreement_signed: 'bg-sky-50 text-sky-800 ring-1 ring-sky-200',
-  disbursed: 'bg-emerald-600 text-white',
-  cancelled: 'bg-slate-100 text-slate-500',
+  draft: 'bg-ink-100 text-ink-700',
+  submitted: 'bg-warn-50 text-warn-800 ring-1 ring-warn-200',
+  approved: 'bg-good-50 text-good-800 ring-1 ring-good-200',
+  declined: 'bg-bad-50 text-bad-700 ring-1 ring-bad-200',
+  agreement_signed: 'bg-info-50 text-info-800 ring-1 ring-info-200',
+  disbursed: 'bg-good-600 text-white',
+  cancelled: 'bg-ink-100 text-ink-500',
 }
 
 export function StatusBadge({ status, label }: { status: ApplicationStatus; label: string }) {
