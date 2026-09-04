@@ -13,10 +13,27 @@ it('seeds every catalogued permission', function (): void {
         ->toBe(collect(Permissions::all())->sort()->values()->all());
 });
 
-it('grants an administrator every permission', function (): void {
+/**
+ * An administrator oversees the book and hands out access, so the one thing
+ * they must not also do is move money. Holding both the power to grant a
+ * permission and the power to release funds leaves nothing for anyone else to
+ * check, which is the whole point of splitting the roles.
+ */
+it('gives an administrator oversight of everything except releasing money', function (): void {
     $admin = User::factory()->withRole(Roles::ADMIN)->create();
 
-    expect($admin->permissionSlugs())->toEqualCanonicalizing(Permissions::all());
+    $withheld = [
+        Permissions::DISBURSEMENTS_VERIFY,
+        Permissions::DISBURSEMENTS_PAY,
+        Permissions::COMMISSIONS_PAY,
+    ];
+
+    expect($admin->permissionSlugs())
+        ->toEqualCanonicalizing(array_values(array_diff(Permissions::all(), $withheld)));
+
+    foreach ($withheld as $permission) {
+        expect($admin->hasPermission($permission))->toBeFalse();
+    }
 });
 
 /**
