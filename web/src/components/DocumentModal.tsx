@@ -4,21 +4,29 @@ import { Spinner } from '@/components/Spinner'
 import { api } from '@/lib/api'
 
 /**
- * Shows a stored document without ever exposing a URL to it.
+ * Either a document already on file, fetched by path, or one the user has just
+ * picked and not yet sent.
+ */
+type Source = { path: string; file?: never } | { file: File; path?: never }
+
+/**
+ * Shows a document without ever exposing a URL to it.
  *
- * The file lives on the private disk and is only handed over on an
+ * A stored file lives on the private disk and is only handed over on an
  * authenticated request, so it is fetched as a blob and rendered from an
- * object URL held for as long as the modal is open. That URL is revoked on
- * close: a blob left registered is a copy of a payslip sitting in the tab
- * until the page is reloaded.
+ * object URL held for as long as the modal is open. A file chosen in the
+ * browser needs no request at all and is read straight off disk.
+ *
+ * Either way the object URL is revoked on close: one left registered is a copy
+ * of a payslip sitting in the tab until the page is reloaded.
  */
 export function DocumentModal({
   path,
+  file,
   title,
   subtitle,
   onClose,
-}: {
-  path: string
+}: Source & {
   title: string
   subtitle?: string
   onClose: () => void
@@ -33,14 +41,16 @@ export function DocumentModal({
 
     async function load() {
       try {
-        const response = await api.get<Blob>(path, { responseType: 'blob' })
+        // A file the user just chose is already in the browser. Only a stored
+        // one has to be asked for.
+        const blob = file ?? (await api.get<Blob>(path ?? '', { responseType: 'blob' })).data
 
         if (revoked) {
           return
         }
 
-        created = URL.createObjectURL(response.data)
-        setMimeType(response.data.type)
+        created = URL.createObjectURL(blob)
+        setMimeType(blob.type)
         setObjectUrl(created)
       } catch {
         setError('That document could not be opened.')
@@ -56,7 +66,7 @@ export function DocumentModal({
         URL.revokeObjectURL(created)
       }
     }
-  }, [path])
+  }, [path, file])
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
@@ -77,30 +87,30 @@ export function DocumentModal({
       role="dialog"
       aria-modal="true"
       aria-label={title}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/60 p-4"
       onClick={onClose}
     >
       <div
         className="flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg bg-white shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-ink-200 px-5 py-4">
           <div>
-            <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
-            {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
+            <h2 className="text-sm font-semibold text-ink-900">{title}</h2>
+            {subtitle && <p className="text-xs text-ink-500">{subtitle}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            className="rounded-md border border-ink-300 px-3 py-1.5 text-sm font-medium text-ink-700 hover:bg-ink-100"
           >
             Close
           </button>
         </div>
 
-        <div className="flex min-h-[60vh] flex-1 items-center justify-center overflow-auto bg-slate-50 p-4">
+        <div className="flex min-h-[60vh] flex-1 items-center justify-center overflow-auto bg-ink-50 p-4">
           {error ? (
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-bad-700">{error}</p>
           ) : !objectUrl ? (
             <Spinner />
           ) : isImage ? (
