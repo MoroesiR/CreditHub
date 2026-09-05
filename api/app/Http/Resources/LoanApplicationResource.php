@@ -24,6 +24,9 @@ class LoanApplicationResource extends JsonResource
             'application_number' => $this->application_number,
 
             'amount' => $this->amount,
+            'initiation_fee' => $this->initiation_fee,
+            'amount_financed' => $this->amount_financed,
+            'monthly_service_fee' => $this->monthly_service_fee,
             'term_months' => $this->term_months,
             'interest_rate' => $this->interest_rate,
             'monthly_instalment' => $this->monthly_instalment,

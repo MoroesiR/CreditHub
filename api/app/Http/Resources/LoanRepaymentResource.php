@@ -21,6 +21,10 @@ class LoanRepaymentResource extends JsonResource
         return [
             'id' => $this->id,
             'amount' => $this->amount,
+            // How the receipt was split, in the order the Act prescribes.
+            'fee_portion' => $this->fee_portion,
+            'interest_portion' => $this->interest_portion,
+            'capital_portion' => $this->capital_portion,
             'received_on' => $this->received_on?->toDateString(),
             'method' => $this->method->value,
             'method_label' => $this->method->label(),

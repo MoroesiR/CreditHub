@@ -21,6 +21,7 @@ final class DisbursementService
 {
     public function __construct(
         private readonly CommissionCalculator $commissions,
+        private readonly ScheduleWriter $schedules,
         private readonly AuditRecorder $audit,
     ) {}
 
@@ -159,6 +160,11 @@ final class DisbursementService
             ]);
 
             $application->update(['status' => LoanApplicationStatus::Disbursed]);
+
+            // Written here rather than at approval: the first instalment falls
+            // a month after the payout, so the dates are not knowable until
+            // the money has left.
+            $this->schedules->write($application, $disbursement->paid_at);
 
             $this->audit->record(
                 action: 'disbursement.paid',

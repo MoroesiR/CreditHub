@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
-    'loan_application_id', 'amount', 'received_on', 'method',
+    'loan_application_id', 'amount', 'fee_portion', 'interest_portion', 'capital_portion',
+    'received_on', 'method',
     'reference', 'note', 'reverses_id', 'recorded_by',
 ])]
 class LoanRepayment extends Model
@@ -23,6 +24,9 @@ class LoanRepayment extends Model
     {
         return [
             'amount' => 'float',
+            'fee_portion' => 'float',
+            'interest_portion' => 'float',
+            'capital_portion' => 'float',
             'received_on' => 'immutable_date',
             'method' => RepaymentMethod::class,
         ];

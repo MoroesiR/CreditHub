@@ -63,8 +63,11 @@ final class AgreementService
                 // agreement, and the pair are obvious on sight.
                 'agreement_number' => str_replace('CHL', 'CHA', $application->application_number),
                 'amount' => $application->amount,
+                'initiation_fee' => $application->initiation_fee,
+                'amount_financed' => $application->amount_financed,
                 'term_months' => $application->term_months,
                 'interest_rate' => $application->interest_rate,
+                'monthly_service_fee' => $application->monthly_service_fee,
                 'monthly_instalment' => $application->monthly_instalment,
                 'total_repayable' => $application->total_repayable,
                 'generated_at' => now(),

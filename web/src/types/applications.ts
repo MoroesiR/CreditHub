@@ -34,6 +34,9 @@ export interface LoanApplication {
   id: number
   application_number: string
   amount: number
+  initiation_fee: number
+  amount_financed: number
+  monthly_service_fee: number
   term_months: number
   interest_rate: number
   monthly_instalment: number
@@ -55,8 +58,15 @@ export interface LoanApplication {
 }
 
 export interface LoanQuote {
-  monthly_instalment: number
-  total_repayable: number
-  total_interest: number
+  advance: number
+  initiation_fee: number
+  amount_financed: number
   interest_rate: number
+  capital_instalment: number
+  monthly_service_fee: number
+  monthly_instalment: number
+  total_interest: number
+  total_service_fees: number
+  total_repayable: number
+  cost_of_credit: number
 }

@@ -10,6 +10,7 @@ use App\Models\LoanApplication;
 use App\Models\LoanRepayment;
 use App\Models\User;
 use App\Services\Audit\AuditRecorder;
+use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -17,6 +18,7 @@ final class RepaymentService
 {
     public function __construct(
         private readonly LoanAccount $accounts,
+        private readonly PaymentAllocator $allocator,
         private readonly AuditRecorder $audit,
     ) {}
 
@@ -50,8 +52,17 @@ final class RepaymentService
         }
 
         return DB::transaction(function () use ($application, $data, $recordedBy, $ipAddress): LoanRepayment {
+            $split = $this->allocator->allocate(
+                $application,
+                (float) $data['amount'],
+                new DateTimeImmutable($data['received_on']),
+            );
+
             $repayment = $application->repayments()->create([
                 'amount' => $data['amount'],
+                'fee_portion' => $split['fee'],
+                'interest_portion' => $split['interest'],
+                'capital_portion' => $split['capital'],
                 'received_on' => $data['received_on'],
                 'method' => $data['method'],
                 'reference' => $data['reference'] ?? null,
@@ -65,15 +76,19 @@ final class RepaymentService
                 action: 'repayment.recorded',
                 subject: $application,
                 summary: sprintf(
-                    'Received R%s by %s on %s. Balance now R%s.',
+                    'Received R%s by %s on %s, applied as R%s fees, R%s interest and R%s capital. Balance now R%s.',
                     number_format((float) $data['amount'], 2),
                     RepaymentMethod::from($data['method'])->label(),
                     $repayment->received_on->format('j M Y'),
+                    number_format($split['fee'], 2),
+                    number_format($split['interest'], 2),
+                    number_format($split['capital'], 2),
                     number_format($after['balance'], 2),
                 ),
                 actor: $recordedBy,
                 metadata: [
                     'amount' => $data['amount'],
+                    'allocation' => $split,
                     'method' => $data['method'],
                     'reference' => $data['reference'] ?? null,
                     'balance_after' => $after['balance'],
@@ -110,6 +125,9 @@ final class RepaymentService
             $reversal = LoanRepayment::create([
                 'loan_application_id' => $repayment->loan_application_id,
                 'amount' => -$repayment->amount,
+                'fee_portion' => -$repayment->fee_portion,
+                'interest_portion' => -$repayment->interest_portion,
+                'capital_portion' => -$repayment->capital_portion,
                 'received_on' => $repayment->received_on,
                 'method' => RepaymentMethod::Reversal,
                 'reference' => $repayment->reference,

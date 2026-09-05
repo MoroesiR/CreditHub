@@ -301,6 +301,13 @@ export function RepaymentsPage() {
                                 {entry.reference ? ` · ${entry.reference}` : ''} · captured by{' '}
                                 {entry.recorded_by}
                               </p>
+                              {!entry.is_reversal && (
+                                <p className="tabular text-xs text-ink-500">
+                                  fees {formatMoney(entry.fee_portion)} · interest{' '}
+                                  {formatMoney(entry.interest_portion)} · capital{' '}
+                                  {formatMoney(entry.capital_portion)}
+                                </p>
+                              )}
                               {entry.note && (
                                 <p className="text-xs text-ink-600">{entry.note}</p>
                               )}

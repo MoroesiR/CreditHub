@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'loan_application_id', 'agreement_number', 'amount', 'term_months', 'interest_rate',
+    'loan_application_id', 'agreement_number', 'amount', 'initiation_fee', 'amount_financed',
+    'term_months', 'interest_rate', 'monthly_service_fee',
     'monthly_instalment', 'total_repayable', 'generated_at', 'generated_by',
     'signature_path', 'photo_path', 'signed_name', 'signed_at', 'witnessed_by', 'signed_ip',
 ])]
@@ -22,6 +23,9 @@ class LoanAgreement extends Model
     {
         return [
             'amount' => 'float',
+            'initiation_fee' => 'float',
+            'amount_financed' => 'float',
+            'monthly_service_fee' => 'float',
             'interest_rate' => 'float',
             'monthly_instalment' => 'float',
             'total_repayable' => 'float',

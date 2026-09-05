@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
     'application_number', 'client_id', 'recruiter_id', 'affordability_assessment_id',
-    'amount', 'term_months', 'interest_rate', 'purpose', 'status',
+    'amount', 'initiation_fee', 'amount_financed', 'term_months', 'interest_rate',
+    'monthly_service_fee', 'purpose', 'status',
     'monthly_instalment', 'total_repayable', 'disposable_income_at_capture',
     'submitted_at', 'submitted_by', 'decided_at', 'decided_by', 'decline_reason',
 ])]
@@ -29,7 +30,10 @@ class LoanApplication extends Model
     {
         return [
             'amount' => 'float',
+            'initiation_fee' => 'float',
+            'amount_financed' => 'float',
             'interest_rate' => 'float',
+            'monthly_service_fee' => 'float',
             'monthly_instalment' => 'float',
             'total_repayable' => 'float',
             'disposable_income_at_capture' => 'float',
@@ -93,6 +97,14 @@ class LoanApplication extends Model
     public function agreement(): HasOne
     {
         return $this->hasOne(LoanAgreement::class);
+    }
+
+    /**
+     * @return HasMany<LoanScheduleEntry, $this>
+     */
+    public function scheduleEntries(): HasMany
+    {
+        return $this->hasMany(LoanScheduleEntry::class)->orderBy('instalment_number');
     }
 
     /**

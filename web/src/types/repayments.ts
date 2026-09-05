@@ -8,6 +8,10 @@ export interface LoanAccountSummary {
   is_settled: boolean
   is_in_arrears: boolean
   months_behind: number
+  fees_paid: number
+  interest_paid: number
+  capital_paid: number
+  next_due_on: string | null
 }
 
 export interface LoanBookRow {
@@ -40,6 +44,9 @@ export interface LoanBook {
 export interface Repayment {
   id: number
   amount: number
+  fee_portion: number
+  interest_portion: number
+  capital_portion: number
   received_on: string | null
   method: string
   method_label: string

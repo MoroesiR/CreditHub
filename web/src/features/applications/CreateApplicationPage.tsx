@@ -206,23 +206,62 @@ export function CreateApplicationPage() {
         <dl className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>
             <dt className="text-sm text-ink-500">Monthly instalment</dt>
-            <dd className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
+            <dd className="tabular mt-1 text-2xl font-semibold tracking-tight text-ink-900">
               {quote ? formatMoney(quote.monthly_instalment) : '-'}
             </dd>
+            {quote && (
+              <dd className="text-xs text-ink-500">
+                {formatMoney(quote.capital_instalment)} plus{' '}
+                {formatMoney(quote.monthly_service_fee)} service fee
+              </dd>
+            )}
           </div>
           <div>
             <dt className="text-sm text-ink-500">Total repayable</dt>
-            <dd className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
+            <dd className="tabular mt-1 text-2xl font-semibold tracking-tight text-ink-900">
               {quote ? formatMoney(quote.total_repayable) : '-'}
             </dd>
           </div>
           <div>
             <dt className="text-sm text-ink-500">Cost of credit</dt>
-            <dd className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
-              {quote ? formatMoney(quote.total_interest) : '-'}
+            <dd className="tabular mt-1 text-2xl font-semibold tracking-tight text-ink-900">
+              {quote ? formatMoney(quote.cost_of_credit) : '-'}
             </dd>
+            <dd className="text-xs text-ink-500">everything above the advance</dd>
           </div>
         </dl>
+
+        {quote && (
+          <div className="mt-4 rounded-md border border-ink-200 bg-white/60 p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
+              What makes it up
+            </p>
+            <dl className="tabular mt-2 space-y-1 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-ink-600">Advance to the client</dt>
+                <dd className="text-ink-900">{formatMoney(quote.advance)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-ink-600">Initiation fee, financed with the loan</dt>
+                <dd className="text-ink-900">{formatMoney(quote.initiation_fee)}</dd>
+              </div>
+              <div className="flex justify-between border-t border-ink-200 pt-1">
+                <dt className="text-ink-600">Amount financed</dt>
+                <dd className="font-medium text-ink-900">{formatMoney(quote.amount_financed)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-ink-600">Interest at {quote.interest_rate}% a year</dt>
+                <dd className="text-ink-900">{formatMoney(quote.total_interest)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-ink-600">
+                  Service fee, {formatMoney(quote.monthly_service_fee)} for {months} months
+                </dt>
+                <dd className="text-ink-900">{formatMoney(quote.total_service_fees)}</dd>
+              </div>
+            </dl>
+          </div>
+        )}
 
         {client && (
           <p className="mt-4 text-sm">
