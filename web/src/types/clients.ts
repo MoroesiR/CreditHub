@@ -79,3 +79,12 @@ export interface Locations {
   provinces: string[]
   country: string
 }
+
+/** Whether a client may take a loan, and what is in the way if not. */
+export interface BorrowingEligibility {
+  eligible: boolean
+  reason: string | null
+  blocking_application_id: number | null
+  blocking_application_number: string | null
+  outstanding: number | null
+}

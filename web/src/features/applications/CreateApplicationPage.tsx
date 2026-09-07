@@ -1,10 +1,11 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { Field, Section, inputClass } from '@/components/Field'
 import { DocumentUpload } from '@/features/applications/DocumentUpload'
 import { createApplication, quoteLoan } from '@/features/applications/api'
+import { fetchBorrowingEligibility } from '@/features/clients/api'
 import { ClientPicker } from '@/features/clients/ClientPicker'
 import { errorMessage } from '@/lib/api'
 import { formatMoney } from '@/lib/format'
@@ -43,6 +44,15 @@ export function CreateApplicationPage() {
   const [purpose, setPurpose] = useState('')
   const [documents, setDocuments] = useState<Partial<Record<DocumentType, File>>>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
+
+  // Asked as soon as a client is chosen, so an officer is told a client
+  // cannot borrow before they have typed an amount rather than after they
+  // have attached three documents and pressed submit.
+  const { data: eligibility } = useQuery({
+    queryKey: ['clients', client?.id, 'borrowing'],
+    queryFn: () => fetchBorrowingEligibility(client?.id ?? 0),
+    enabled: client !== null,
+  })
 
   // Priced by the API, not in the browser: the instalment shown to the client
   // must be the one the lender will actually book.
@@ -100,7 +110,11 @@ export function CreateApplicationPage() {
   }
 
   const canSubmit =
-    client !== null && affordable === true && missingDocuments.length === 0 && !mutation.isPending
+    client !== null &&
+    eligibility?.eligible === true &&
+    affordable === true &&
+    missingDocuments.length === 0 &&
+    !mutation.isPending
 
   return (
     <div className="space-y-6">
@@ -121,6 +135,29 @@ export function CreateApplicationPage() {
       <Section title="Client">
         <div className="sm:col-span-2">
           <ClientPicker value={client} onChange={setClient} />
+
+          {client && eligibility && !eligibility.eligible && (
+            <div className="mt-3 rounded-md border border-bad-200 bg-bad-50 p-4">
+              <p className="text-sm font-medium text-bad-800">
+                {client.full_name} cannot take another loan yet
+              </p>
+              <p className="mt-1 text-sm text-bad-700">{eligibility.reason}</p>
+              {eligibility.blocking_application_id && (
+                <Link
+                  to={`/applications/${eligibility.blocking_application_id}`}
+                  className="mt-2 inline-block text-sm font-medium text-bad-800 underline"
+                >
+                  Open {eligibility.blocking_application_number}
+                </Link>
+              )}
+            </div>
+          )}
+
+          {client && eligibility?.eligible && (
+            <p className="mt-3 text-sm text-good-700">
+              No loan outstanding. This client may borrow.
+            </p>
+          )}
         </div>
       </Section>
 
@@ -288,6 +325,8 @@ export function CreateApplicationPage() {
           <p className="mr-auto text-sm text-ink-500">
             {!client
               ? 'Select a client to continue.'
+              : eligibility && !eligibility.eligible
+                ? 'This client already has a loan running.'
               : affordable === false
                 ? 'The instalment is not affordable on the assessment on file.'
                 : missingDocuments.length > 0

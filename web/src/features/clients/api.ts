@@ -2,6 +2,7 @@ import { api } from '@/lib/api'
 import type { ClientProfile } from '@/types/profile'
 import type {
   Bank,
+  BorrowingEligibility,
   Client,
   ClientSearchParams,
   Locations,
@@ -37,6 +38,12 @@ export async function fetchLocations(): Promise<Locations> {
 
 export async function fetchClientProfile(id: number): Promise<ClientProfile> {
   const { data } = await api.get<{ data: ClientProfile }>(`/clients/${id}/profile`)
+
+  return data.data
+}
+
+export async function fetchBorrowingEligibility(clientId: number): Promise<BorrowingEligibility> {
+  const { data } = await api.get<{ data: BorrowingEligibility }>(`/clients/${clientId}/borrowing`)
 
   return data.data
 }

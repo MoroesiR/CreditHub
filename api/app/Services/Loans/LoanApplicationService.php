@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Notifications\ApplicationAwaitingDecision;
 use App\Notifications\ApplicationDecided;
 use App\Services\Audit\AuditRecorder;
+use App\Services\Clients\BorrowingEligibility;
 use App\Services\Notifications\NotificationAudience;
 use App\Services\Reference\ReferenceNumberService;
 use App\Support\Permissions;
@@ -25,6 +26,7 @@ final class LoanApplicationService
         private readonly ReferenceNumberService $references,
         private readonly InstalmentCalculator $pricing,
         private readonly ApplicationDocumentStore $documents,
+        private readonly BorrowingEligibility $eligibility,
         private readonly AuditRecorder $audit,
         private readonly NotificationAudience $audience,
     ) {}
@@ -47,6 +49,14 @@ final class LoanApplicationService
         ?string $ipAddress = null,
         array $documents = [],
     ): LoanApplication {
+        // Checked before anything else: a client who may not borrow at all
+        // should not be told about their affordability instead.
+        $eligibility = $this->eligibility->check($client);
+
+        if (! $eligibility['eligible']) {
+            throw new RuntimeException($eligibility['reason'] ?? 'This client may not take a loan at present.');
+        }
+
         $assessment = $client->latestAffordability;
 
         if ($assessment === null) {

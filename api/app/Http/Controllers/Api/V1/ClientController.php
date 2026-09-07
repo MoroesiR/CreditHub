@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\Clients\IndexClientRequest;
 use App\Http\Requests\Api\V1\Clients\StoreClientRequest;
 use App\Http\Resources\ClientResource;
 use App\Models\Client;
+use App\Services\Clients\BorrowingEligibility;
 use App\Services\Clients\ClientProfile;
 use App\Services\Clients\ClientRegistrationService;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +58,19 @@ final class ClientController extends Controller
         return (new ClientResource($client))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    /**
+     * Whether this client may take a loan, and if not, what is in the way.
+     *
+     * Its own route rather than a field on the client, because answering it
+     * means reading every loan's schedule and receipts. Doing that for each
+     * row of a search would cost far more than the answer is worth on a list
+     * nobody is borrowing from.
+     */
+    public function borrowing(Client $client, BorrowingEligibility $eligibility): JsonResponse
+    {
+        return response()->json(['data' => $eligibility->check($client)]);
     }
 
     public function show(Client $client): ClientResource

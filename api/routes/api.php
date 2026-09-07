@@ -88,6 +88,11 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:'.Permissions::CLIENTS_CREATE)
             ->name('clients.store');
 
+        // Declared before {client} so "borrowing" is not read as an id.
+        Route::get('clients/{client}/borrowing', [ClientController::class, 'borrowing'])
+            ->middleware('permission:'.Permissions::APPLICATIONS_CREATE)
+            ->name('clients.borrowing');
+
         Route::get('clients/{client}', [ClientController::class, 'show'])
             ->middleware('permission:'.Permissions::CLIENTS_VIEW)
             ->name('clients.show');
