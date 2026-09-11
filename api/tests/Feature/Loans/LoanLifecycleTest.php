@@ -174,7 +174,7 @@ it('lets a client borrow again once the loan is settled', function (): void {
         ->and(app(BorrowingEligibility::class)->check($client->fresh())['eligible'])->toBeTrue();
 });
 
-it('applies a payment to fees, then interest, then capital', function (): void {
+it('applies a payment to interest, then fees, then capital', function (): void {
     $client = makeClient();
     $loan = disburse($client, 20000, 12);
 
@@ -195,26 +195,26 @@ it('applies a payment to fees, then interest, then capital', function (): void {
         'note' => null,
     ], $this->collections);
 
-    // Short of the fees outstanding, so every cent goes to fees and none of it
-    // touches the balance.
-    $first = $pay(round($feesDue - 10, 2));
+    // Short of the interest outstanding, so every cent goes to interest and
+    // none of it reaches the fees or the balance.
+    $first = $pay(round($interestDue - 10, 2));
 
-    expect($first->fee_portion)->toBe(round($feesDue - 10, 2))
-        ->and($first->interest_portion)->toBe(0.0)
+    expect($first->interest_portion)->toBe(round($interestDue - 10, 2))
+        ->and($first->fee_portion)->toBe(0.0)
         ->and($first->capital_portion)->toBe(0.0);
 
-    // Enough to finish the fees and start on interest, still nothing to capital.
+    // Enough to finish the interest and start on fees, still nothing to capital.
     $second = $pay(60.00);
 
-    expect($second->fee_portion)->toBe(10.0)
-        ->and($second->interest_portion)->toBe(50.0)
+    expect($second->interest_portion)->toBe(10.0)
+        ->and($second->fee_portion)->toBe(50.0)
         ->and($second->capital_portion)->toBe(0.0);
 
-    // Past the interest outstanding, so the remainder finally reduces capital.
-    $third = $pay(round($interestDue - 50 + 400, 2));
+    // Past the fees outstanding, so the remainder finally reduces capital.
+    $third = $pay(round($feesDue - 50 + 400, 2));
 
-    expect($third->fee_portion)->toBe(0.0)
-        ->and($third->interest_portion)->toBe(round($interestDue - 50, 2))
+    expect($third->interest_portion)->toBe(0.0)
+        ->and($third->fee_portion)->toBe(round($feesDue - 50, 2))
         ->and($third->capital_portion)->toBe(400.0);
 
     Carbon::setTestNow();

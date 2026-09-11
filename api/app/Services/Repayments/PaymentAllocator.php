@@ -10,11 +10,12 @@ use DateTimeImmutable;
 /**
  * Splits a receipt across what the client owes.
  *
- * The National Credit Act prescribes the order and it is not the lender's to
- * choose: charges and fees first, then interest, then capital. It matters
- * because a client who pays short still clears the month's fee and interest,
- * so the shortfall lands on capital and the loan simply runs longer, rather
- * than the lender helping itself to capital and leaving fees to accumulate.
+ * The National Credit Act prescribes the order in section 126(3) and it is
+ * not the lender's to choose: interest first, then fees and charges, then
+ * capital. A client who pays short therefore still clears the month's interest
+ * and fee, so the shortfall lands on capital and the loan simply runs longer,
+ * rather than the lender helping itself to capital and leaving charges to
+ * accumulate.
  *
  * Only what has actually fallen due is charged for. A client paying early is
  * not billed for interest that has not accrued yet, so the surplus goes
@@ -51,7 +52,7 @@ final class PaymentAllocator
         $remaining = round($amount, 2);
         $split = ['fee' => 0.0, 'interest' => 0.0, 'capital' => 0.0];
 
-        foreach (['fee', 'interest'] as $bucket) {
+        foreach (['interest', 'fee'] as $bucket) {
             $taken = min($remaining, $outstanding[$bucket]);
             $split[$bucket] = round($taken, 2);
             $remaining = round($remaining - $taken, 2);

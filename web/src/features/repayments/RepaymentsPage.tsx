@@ -303,8 +303,8 @@ export function RepaymentsPage() {
                               </p>
                               {!entry.is_reversal && (
                                 <p className="tabular text-xs text-ink-500">
-                                  fees {formatMoney(entry.fee_portion)} · interest{' '}
-                                  {formatMoney(entry.interest_portion)} · capital{' '}
+                                  interest {formatMoney(entry.interest_portion)} · fees{' '}
+                                  {formatMoney(entry.fee_portion)} · capital{' '}
                                   {formatMoney(entry.capital_portion)}
                                 </p>
                               )}
