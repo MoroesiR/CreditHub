@@ -103,6 +103,26 @@ An application is refused if the instalment exceeds the disposable income on
 the client's assessment. The assessment, the recruiter and the quote are copied
 onto the application at capture, so none of them drift afterwards.
 
+A client borrows **one loan at a time**. While a loan is being repaid, or an
+earlier application is anywhere between capture and payout, a new one is
+refused: two files assessed separately against the same income can each look
+affordable and be unaffordable together. The block lifts the moment the balance
+reaches zero. The capture screen says so as soon as the client is picked, and
+the service refuses for the same reason if anything gets past the screen.
+
+**Fees** are the two the National Credit Act allows besides interest, capped in
+[`FeeSchedule`](api/app/Support/FeeSchedule.php):
+
+| Fee | Charged | Before VAT |
+|---|---|---|
+| Initiation | once, financed with the loan | R165 plus 10% of the advance above R1 000, capped at R1 050 |
+| Service | monthly, with the instalment | R60 |
+
+Interest is 28.75% a year on the amount financed. The quote breaks the
+instalment into each of these, so an officer can explain it line by line. The
+caps are set by regulation and amended from time to time, which is why they
+live in one file.
+
 **Commission** is a tiered percentage, capped above the entry band, so the rate
 stays realistic as loans grow:
 
@@ -119,9 +139,21 @@ that is never disbursed earns nobody anything. Schemes are versioned and every
 commission row stores the version it was priced under, so a payout from last
 year can still be explained this year.
 
-**Repayments** are recorded, never edited. A receipt captured in error is
-corrected by a reversal that sits beside the original, so the account history
-stays a record of what happened.
+**Repayments** are measured against a schedule written at payout, one row per
+instalment, split into interest, service fee and capital. The quote and the
+schedule come from the same amortisation, so a loan paid exactly as quoted
+ends at exactly R0.00.
+
+Each receipt is applied in the order section 126(3) of the Act sets: interest,
+then fees and charges, then capital, and only against instalments that have
+actually fallen due. A short payment still clears what the month has cost and
+the loan runs longer; an early one reduces capital rather than prepaying
+interest that has not accrued. Arrears are whatever has fallen due and not been
+met.
+
+Receipts are recorded, never edited. One captured in error is corrected by a
+reversal that sits beside the original, so the account history stays a record
+of what happened.
 
 ---
 
@@ -157,6 +189,12 @@ Create the database named in `.env`, then:
 php artisan migrate --seed
 php artisan serve            # http://127.0.0.1:8000
 ```
+
+Outside production, `--seed` also builds a demo book through the same services
+the application uses: 8 clients, 4 recruiters, and 7 applications standing at
+every stage from awaiting a decision to settled, one of them paying on time and
+one three instalments behind. It does nothing if the database already has
+clients.
 
 ### Web
 
@@ -200,13 +238,18 @@ cd web && npm run lint             # eslint, type-aware
 cd web && npm run build            # tsc and production build
 ```
 
+The feature tests take loans through the real services end to end: a second
+loan refused while the first is running, borrowing reopening on settlement, the
+order a payment is applied in, a reversal netting to zero, commission earned at
+payout and not at approval, and a payout refused until it is verified.
+
 CI runs all of it on every push and pull request.
 
 ---
 
 ## API
 
-Base URL `/api/v1`, 52 routes. Every one is either explicitly public or behind
+Base URL `/api/v1`, 53 routes. Every one is either explicitly public or behind
 `auth:sanctum`, and anything needing more states its permission on the route
 line in [`api/routes/api.php`](api/routes/api.php), which is the authorisation
 contract for the whole application.
@@ -214,7 +257,7 @@ contract for the whole application.
 | Area | Routes |
 |---|---|
 | Auth | `POST /auth/login` (public, rate limited), `GET /auth/me`, `POST /auth/logout` |
-| Clients | search, register, profile, documents |
+| Clients | search, register, profile, documents, borrowing eligibility |
 | Recruiters | search, register, clients introduced, audit trail |
 | Applications | capture with documents, decide, agreement, signature, audit trail |
 | Disbursements | queue, verify, hold, pay |
@@ -237,12 +280,14 @@ Each slice worked end to end before the next started.
 - [x] Repayments: receipts, reversals, arrears
 - [x] Change requests: corrections routed through an administrator with proof
 - [x] Reports, staff accounts, notifications, audit trail throughout
+- [x] Fees to the regulated caps, a stored repayment schedule, receipts applied in the statutory order
+- [x] One loan per client at a time, a seeded demo book, tests over the money paths
 
 ### Not built
 
 - No client-facing portal. Borrowers never sign in; every screen is staff facing.
-- Arrears are derived from the instalments that have fallen due rather than
-  from a stored schedule. That is correct while every loan is equal instalment,
-  but a restructure or a payment holiday would need a real schedule table.
+- No restructures or payment holidays. The stored schedule could carry them,
+  but nothing writes one yet.
+- No settlement quote, payment arrangement or client statement.
 - No PDF of the agreement for the client to take away.
 - Notifications are in-app only. No mail or SMS gateway is wired up.
