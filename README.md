@@ -9,6 +9,10 @@ approving it, releasing the funds and receipting repayments are four different
 permissions held by four different roles, and no role holds more than one of
 them. Every change is written to an append-only audit trail as it happens.
 
+![The administrator dashboard, showing totals for clients, applications, disbursements and commission](docs/screenshots/dashboard.png)
+
+*The administrator sees the whole book and cannot move a cent of it.*
+
 ---
 
 ## Stack
@@ -64,6 +68,21 @@ hold both permissions.
 
 Corrections to a record go through an administrator rather than being edited in
 place, and have to carry the document that supports them.
+
+![Creating a loan application, with the client picked and the quote priced](docs/screenshots/create-application.png)
+
+*Capture. The client is picked from the book and the instalment is priced by the
+API, so the figure an officer reads out is the one the lender will book.*
+
+![An application file showing each step, who performed it and when](docs/screenshots/application-timeline.png)
+
+*Every file carries its own chain of custody: who captured it, who decided it,
+who released the money.*
+
+![The disbursement queue listing signed agreements awaiting verification and payment](docs/screenshots/disbursement-queue.png)
+
+*The payouts desk sees only what has been signed. Verifying and paying are two
+separate acts, and neither is available to the officer who originated the loan.*
 
 ---
 
@@ -151,6 +170,11 @@ the loan runs longer; an early one reduces capital rather than prepaying
 interest that has not accrued. Arrears are whatever has fallen due and not been
 met.
 
+![The loan book with receipts split into interest, fees and capital](docs/screenshots/repayments.png)
+
+*Each receipt is split in the order section 126(3) sets, and the split is stored
+with the receipt rather than recalculated whenever the page is opened.*
+
 Receipts are recorded, never edited. One captured in error is corrected by a
 reversal that sits beside the original, so the account history stays a record
 of what happened.
@@ -163,6 +187,11 @@ Supporting documents are required at submission and are held on the private
 disk under generated names, never under the name the browser supplied and never
 in `public/`. They are streamed through an authenticated route, so a payslip is
 not reachable by guessing a URL, and are read in a modal rather than downloaded.
+
+![A client profile with personal details, loan history and documents](docs/screenshots/client-profile.png)
+
+*One borrower's whole file: who they are, every application, every receipt and
+every document held against them.*
 
 A change request has to carry the right proof: a bank statement for banking
 details, a payslip for employment, an ID copy for a name or identity number.
@@ -213,6 +242,10 @@ resolves to IPv4 or IPv6. `VITE_PROXY_TARGET` sets where it forwards;
 ### Demo sign-ins
 
 Seeded outside production only. The password is `password` for all of them.
+
+![The CreditHub sign-in page](docs/screenshots/login.png)
+
+*Sign in as any of the accounts below to see a different system.*
 
 | Email | Role |
 |---|---|
