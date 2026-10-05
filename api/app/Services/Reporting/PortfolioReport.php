@@ -16,10 +16,9 @@ use Illuminate\Support\Carbon;
 /**
  * What the book looks like, in money rather than counts alone.
  *
- * Two figures are deliberately kept apart. Approved is what the lender has
- * committed to; disbursed is what has actually left the bank account. A loan
- * can be approved and never paid, so reporting the two as one number would
- * overstate what has been spent.
+ * Approved and disbursed stay apart: approved is what the lender committed to,
+ * disbursed is what left the bank account, and a loan can be approved and
+ * never paid.
  */
 final class PortfolioReport
 {
@@ -110,9 +109,8 @@ final class PortfolioReport
     /**
      * How the book is being repaid.
      *
-     * Collected is money in. Outstanding is what those loans still owe, and
-     * arrears is the part of it that should already have been paid, which is
-     * the only figure that says whether the book is healthy.
+     * Collected is money in, outstanding is what those loans still owe, and
+     * arrears is the part that should already have been paid.
      *
      * @return array<string, mixed>
      */

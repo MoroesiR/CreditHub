@@ -29,8 +29,7 @@ export function DocumentUpload({
   onChange: (type: DocumentType, file: File | null) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
-  // Attaching the wrong file is easy and invisible until someone downstream
-  // opens it, so the officer can check the page before the application goes.
+  // So the officer can open the file before it goes, and catch the wrong one.
   const [isPreviewing, setIsPreviewing] = useState(false)
   const tooLarge = file !== null && file.size > MAX_BYTES
 

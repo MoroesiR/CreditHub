@@ -12,14 +12,9 @@ use Illuminate\Database\Eloquent\Collection;
  * The state of a disbursed loan: what was owed, what has come in, and whether
  * the client is behind.
  *
- * Expected-to-date is read off the schedule written when the money went out,
- * so it holds for a loan whose instalments are not all the same and can say
- * which instalment a client has reached rather than only how far behind they
- * are in rands.
- *
- * A loan disbursed before schedules existed has none, and for those the older
- * derivation from elapsed months still applies. It gives the same answer for a
- * straight equal-instalment loan, which is all of them from that period.
+ * Expected-to-date comes off the schedule written at payout. Loans disbursed
+ * before schedules existed have none and fall back to elapsed months, which
+ * gives the same answer while every instalment is equal.
  */
 final class LoanAccount
 {

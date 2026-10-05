@@ -34,10 +34,9 @@ final class LoanApplicationService
     /**
      * Captures an application and puts it in front of a credit manager.
      *
-     * The recruiter, the affordability assessment and the quote are all copied
-     * onto the application as it stands now. None of them may drift afterwards:
-     * the recruiter decides who is paid commission, and the assessment and
-     * quote are what any later decision has to be defensible against.
+     * The recruiter, the assessment and the quote are copied onto the
+     * application as they stand now: the recruiter decides who is paid
+     * commission, and the rest is what a later decision is defended against.
      *
      * @param  array{amount: float, term_months: int, purpose: string|null}  $data
      * @param  array<string, UploadedFile>  $documents  Keyed by document type.

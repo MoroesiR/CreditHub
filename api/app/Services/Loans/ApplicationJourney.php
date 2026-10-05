@@ -9,16 +9,11 @@ use App\Enums\LoanApplicationStatus;
 use App\Models\LoanApplication;
 
 /**
- * Who handled a loan, in order, from capture to the last thing that happened
- * to it.
+ * Who handled a loan, in order, from capture to wherever it stands now.
  *
- * Read from the records themselves rather than from the audit trail. The audit
- * trail says what was done; this says where the file stands and whose desk it
- * passed through, which is the question asked when a client phones to ask what
- * is happening to their money.
- *
- * Stages that have not happened yet are still returned, marked as pending, so
- * the caller can show the whole route rather than only the part travelled.
+ * Read from the records rather than the audit trail: the trail says what was
+ * done, this says whose desk the file passed through. Stages that have not
+ * happened yet come back marked pending, so the whole route can be shown.
  */
 final class ApplicationJourney
 {

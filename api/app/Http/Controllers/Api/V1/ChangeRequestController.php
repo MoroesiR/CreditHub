@@ -33,9 +33,7 @@ final class ChangeRequestController extends Controller
 
         $requests = ChangeRequest::query()
             ->with(['subject', 'requestedBy', 'reviewedBy', 'documents'])
-            // Whoever cannot decide a request sees only their own. An officer
-            // has no reason to read a colleague's correction to a file they
-            // are not working on.
+            // Whoever cannot decide a request sees only their own.
             ->unless(
                 $user->hasPermission(Permissions::CHANGE_REQUESTS_REVIEW),
                 fn ($query) => $query->where('requested_by', $user->id),
@@ -44,8 +42,7 @@ final class ChangeRequestController extends Controller
                 $request->filled('status'),
                 fn ($query) => $query->where('status', $request->string('status')->value()),
             )
-            // Lets a client or recruiter page show only its own requests, so a
-            // notification can lead straight to the record being questioned.
+            // Lets a client or recruiter page show only its own requests.
             ->when($request->filled('subject_kind'), function ($query) use ($request): void {
                 $query->where(
                     'subject_type',
@@ -116,8 +113,7 @@ final class ChangeRequestController extends Controller
     public function reject(Request $request, ChangeRequest $changeRequest): JsonResponse
     {
         $validated = $request->validate([
-            // A rejection has to say why: the officer who asked is entitled to
-            // know what to correct before asking again.
+            // A rejection has to say what to correct.
             'note' => ['required', 'string', 'max:255'],
         ]);
 

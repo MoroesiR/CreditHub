@@ -9,14 +9,12 @@ use Illuminate\Support\Facades\Schema;
 /**
  * The payout queue.
  *
- * A row appears here the moment an agreement is signed, and it is the only
- * place money leaves the business. Verification and payment are recorded as
- * two separate acts with two separate timestamps, because "who checked it" and
- * "who released it" are different questions an auditor will ask separately.
+ * A row appears the moment an agreement is signed, and this is the only place
+ * money leaves the business. Verification and payment carry separate
+ * timestamps: who checked it and who released it are different questions.
  *
- * The client's bank details are copied here at payout rather than read from
- * the client record: where the money actually went must not change if the
- * client updates their account afterwards.
+ * Bank details are copied here at payout, so where the money went does not
+ * change when the client updates their account afterwards.
  */
 return new class extends Migration
 {

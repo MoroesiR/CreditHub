@@ -11,14 +11,10 @@ use Illuminate\Notifications\Notification;
 /**
  * Decides who a notification goes to.
  *
- * Every notification in the system is addressed one of two ways: to the person
- * whose file it is, or to whoever holds the permission for the desk that has
- * to act next. Nothing is broadcast. A payout officer has no business being
- * told that a client's surname was corrected, and an administrator does not
- * need a message every time a loan is approved.
+ * Two addresses only: the person whose file it is, or whoever holds the
+ * permission for the desk that has to act next. Nothing is broadcast.
  *
- * Resolving the audience here rather than inline in each service means the
- * rule is stated once and the same query cannot drift between callers.
+ * Resolved here so the rule is stated once and cannot drift between callers.
  */
 final class NotificationAudience
 {

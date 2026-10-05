@@ -28,8 +28,7 @@ final class DisbursementController extends Controller
                 $request->filled('status'),
                 fn ($query) => $query->where('status', $request->string('status')->value()),
             )
-            // Oldest first: a payout queue is worked in the order people have
-            // been waiting, not newest-first like a list of records.
+            // Oldest first: a payout queue is worked in the order people waited.
             ->orderBy('created_at')
             ->paginate($request->integer('per_page', 15))
             ->withQueryString();
@@ -77,8 +76,7 @@ final class DisbursementController extends Controller
     public function pay(Request $request, Disbursement $disbursement): JsonResponse
     {
         $validated = $request->validate([
-            // The bank's own reference for the transfer. Without it a payment
-            // in this system cannot be tied to one on a bank statement.
+            // The bank's reference, so a payment here ties to one on a statement.
             'payment_reference' => ['required', 'string', 'max:100'],
         ]);
 
@@ -112,8 +110,6 @@ final class DisbursementController extends Controller
             'data' => new DisbursementResource(
                 $disbursement->load([
                     'loanApplication.client',
-                    // Loaded so the response can carry the commission the
-                    // payment just earned, if the client was introduced.
                     'loanApplication.commission.recruiter',
                     'verifiedBy',
                     'paidBy',

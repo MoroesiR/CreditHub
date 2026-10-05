@@ -11,13 +11,12 @@ use RuntimeException;
 /**
  * Prices a recruiter's commission on a disbursed loan.
  *
- * A flat percentage pays R5 000 on a R50 000 loan, which no lender carries, so
- * the rate tapers and every band above the entry one is capped. The entry band
- * stays flat: R1 000 introduced earns R100.
+ * A flat percentage would pay R5 000 on a R50 000 loan, so the rate tapers and
+ * every band above the entry one is capped. The entry band stays flat: R1 000
+ * introduced earns R100.
  *
- * The scheme used is returned alongside the figure so the caller can record
- * which version priced the payout. Without that, a historical commission
- * cannot be restated once the scheme changes.
+ * The scheme version comes back with the figure, so a historical payout can
+ * still be explained after the scheme changes.
  */
 final class CommissionCalculator
 {

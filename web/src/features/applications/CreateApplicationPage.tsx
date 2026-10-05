@@ -45,9 +45,7 @@ export function CreateApplicationPage() {
   const [documents, setDocuments] = useState<Partial<Record<DocumentType, File>>>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  // Asked as soon as a client is chosen, so an officer is told a client
-  // cannot borrow before they have typed an amount rather than after they
-  // have attached three documents and pressed submit.
+  // Asked as soon as a client is picked, not after three documents are on.
   const { data: eligibility } = useQuery({
     queryKey: ['clients', client?.id, 'borrowing'],
     queryFn: () => fetchBorrowingEligibility(client?.id ?? 0),

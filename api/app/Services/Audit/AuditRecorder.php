@@ -11,12 +11,11 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Writes the audit trail.
  *
- * Called from inside the transaction that makes the change, so an event can
- * never describe something that was rolled back, and a change can never
- * commit without its event.
+ * Called inside the transaction that makes the change, so an event cannot
+ * describe a rollback and a change cannot commit without its event.
  *
- * The actor's name is copied onto the event rather than only referenced: the
- * trail has to stay readable if that staff account is closed later.
+ * The actor's name is copied onto the event, so the trail stays readable after
+ * that staff account is closed.
  */
 final class AuditRecorder
 {

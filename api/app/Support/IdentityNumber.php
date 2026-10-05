@@ -13,10 +13,8 @@ use DateTimeImmutable;
  * sequence where 0000-4999 is female and 5000-9999 is male, a citizenship
  * digit, and a Luhn check digit.
  *
- * Date of birth and gender are therefore facts about the number, not separate
- * fields to be captured - so they are derived here and never accepted from the
- * request. A typo in a keyed date of birth would otherwise contradict the ID
- * on the same record.
+ * Date of birth and gender are derived here and never accepted from the
+ * request, so a keyed typo cannot contradict the ID on the same record.
  */
 final class IdentityNumber
 {

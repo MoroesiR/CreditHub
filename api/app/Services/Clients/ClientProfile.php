@@ -69,10 +69,8 @@ final class ClientProfile
     /**
      * The client's likeness, taken from the most recent agreement they signed.
      *
-     * There is no separate photograph on the client record: the one captured
-     * at signing is already a picture of this person taken at a moment the
-     * lender can date and attribute, which is worth more than an uploaded file
-     * of unknown origin.
+     * No separate photograph is held on the client record: the one captured at
+     * signing can be dated and attributed, an uploaded file cannot.
      *
      * @return array<string, mixed>|null
      */

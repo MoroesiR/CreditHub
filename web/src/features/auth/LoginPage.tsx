@@ -118,8 +118,7 @@ export function LoginPage() {
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="current-password"
                       aria-invalid={errors.password ? 'true' : undefined}
-                      // Caps lock accounts for a good share of failed sign-ins,
-                      // and the field hides the evidence by design.
+                      // Caps lock causes a fair share of failed sign-ins.
                       onKeyUp={(event) => setCapsLock(event.getModifierState('CapsLock'))}
                       {...register('password')}
                       className="w-full rounded-md border border-ink-300 py-2 pl-3 pr-16 text-sm outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-100"

@@ -41,11 +41,9 @@ class StoreLoanApplicationRequest extends FormRequest
                 'max:'.InstalmentCalculator::MAX_TERM_MONTHS,
             ],
             'purpose' => ['nullable', 'string', 'max:255'],
-            // interest_rate is absent by design: the rate is set by the lender,
-            // not per file, so it cannot be negotiated on a single application.
+            // No interest_rate: the lender sets the rate, not the file.
 
-            // All three supporting documents are required at submission: a
-            // file assessed without them is one the lender cannot defend.
+            // All three supporting documents are required at submission.
             ...$this->documentRules(),
         ];
     }

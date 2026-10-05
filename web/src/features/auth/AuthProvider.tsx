@@ -7,12 +7,10 @@ import type { User } from '@/types/auth'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  // With no stored token there is nothing to resolve, so the app is not
-  // loading - it is simply signed out, and can render the login screen at once.
+  // No stored token means signed out, not loading.
   const [isLoading, setIsLoading] = useState(() => tokenStore.get() !== null)
 
-  // A stored token is a claim, not proof. Resolve it against the API once on
-  // boot so a revoked token never renders a signed-in shell.
+  // A stored token is a claim, not proof: resolve it once on boot.
   useEffect(() => {
     if (!tokenStore.get()) {
       return

@@ -32,10 +32,8 @@ export function AppLayout() {
 
   const roles = user?.roles.map((role) => role.slug) ?? []
 
-  // Two filters, and they answer different questions. Permission decides what
-  // a role may open at all; primaryFor decides what it works in often enough
-  // to deserve a place in the sidebar. A payouts officer can still open a
-  // client from a link on a payout without carrying a Clients entry.
+  // Permission decides what a role may open at all; primaryFor decides what
+  // earns a place in the sidebar.
   const visible = (primaryFor: string[] | undefined, permission: string) =>
     can(permission) && (primaryFor === undefined || primaryFor.some((slug) => roles.includes(slug)))
 

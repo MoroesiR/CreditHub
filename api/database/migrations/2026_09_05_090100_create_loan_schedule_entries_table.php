@@ -9,15 +9,13 @@ use Illuminate\Support\Facades\Schema;
 /**
  * The repayment schedule, written once when the money goes out.
  *
- * Arrears were previously worked out by counting the months since payout and
- * multiplying by the instalment. That gives the right answer only while every
- * loan is a straight equal instalment and nothing is ever restructured, and it
- * cannot say what a given payment was for.
+ * Arrears used to be months since payout times the instalment, which only
+ * holds while every loan is a straight equal instalment and says nothing about
+ * what a payment was for.
  *
- * A stored schedule fixes both. Each row is one instalment split into what it
- * is made of, so a receipt can be applied against fees, then interest, then
- * capital, in the order the National Credit Act prescribes, and a statement
- * can show the client where their money went.
+ * Each row here is one instalment split into interest, fee and capital, so a
+ * receipt can be applied in the order the Act sets and a statement can show
+ * the client where their money went.
  */
 return new class extends Migration
 {

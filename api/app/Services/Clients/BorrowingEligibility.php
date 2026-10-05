@@ -12,20 +12,12 @@ use App\Services\Repayments\LoanAccount;
 /**
  * Whether a client may take a loan today.
  *
- * One at a time. A client still repaying cannot borrow again, and neither can
- * one whose previous application is somewhere between capture and payout,
- * because two files running side by side would each be assessed against an
- * affordability figure that ignores the other. The instalments would be
- * affordable separately and unaffordable together, which is how a lender ends
- * up having granted credit it can show was never affordable.
+ * One at a time: still repaying, or an earlier application anywhere between
+ * capture and payout, and the answer is no. Two files assessed separately
+ * against the same income are affordable apart and unaffordable together.
  *
- * Settling the loan clears the block. Repeat borrowing is the point of keeping
- * a client on file at all, so the door reopens the moment the balance reaches
- * zero.
- *
- * Answering here rather than inside the capture service lets the screen say
- * why a client cannot borrow before an officer has typed anything, and lets
- * the service refuse for exactly the same reason if anyone gets past it.
+ * Settling clears the block. Asked here rather than inside the capture service
+ * so the screen can say why before an officer has typed anything.
  */
 final class BorrowingEligibility
 {

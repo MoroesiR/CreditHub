@@ -9,15 +9,12 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Requests to amend a client or a recruiter.
  *
- * Nobody in origination edits these records directly. An officer who spots a
- * wrong surname or a changed bank account raises a request; an administrator
- * decides it. The reason is that both records decide where money goes - the
- * client is paid the loan and the recruiter is paid commission - so a quiet
- * edit to either is a quiet redirection of funds.
+ * Origination never edits these records directly: an officer raises a request,
+ * an administrator decides it. Both records decide where money goes, so a
+ * quiet edit to either is a quiet redirection of funds.
  *
- * The proposed values are held here rather than applied on submission, so the
- * record is only touched when the request is approved, and the request itself
- * remains as the evidence of who asked and who agreed.
+ * The proposed values sit here until the request is approved, and the request
+ * stays as evidence of who asked and who agreed.
  */
 return new class extends Migration
 {

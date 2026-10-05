@@ -25,19 +25,12 @@ use Illuminate\Support\Carbon;
 /**
  * A working book, so a fresh install has something to look at.
  *
- * Everything here goes through the same services the application uses. Writing
- * rows straight into tables would be quicker and would produce a book with no
- * audit trail, no reference numbers, no repayment schedules and no commission,
- * which is a book that cannot demonstrate any of the things this system exists
- * to do.
+ * Everything goes through the services the application uses, so the data has
+ * an audit trail, reference numbers, schedules and commission. The clock is
+ * moved back while each loan is built, so a loan disbursed five months ago
+ * really does have five instalments fallen due.
  *
- * The clock is moved backwards while each loan is built, so a loan disbursed
- * five months ago really does have five instalments fallen due. Arrears are
- * then a fact about the data rather than a number written into a column.
- *
- * Development only. It is called from DatabaseSeeder behind an environment
- * check, and it does nothing at all if any client already exists, so it will
- * not touch a database that is already in use.
+ * Development only, and skipped entirely if any client already exists.
  */
 class DemoDataSeeder extends Seeder
 {

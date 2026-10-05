@@ -14,14 +14,11 @@ use RuntimeException;
 /**
  * Attaches a client to the recruiter who introduced them, after the fact.
  *
- * The case this exists for: a client is registered while the recruiter who
- * brought them in is not yet on file, so the client is captured as a walk-in.
- * Once that recruiter is registered, the introduction has to be recorded
- * against them or the commission is never earned.
+ * A client registered before their recruiter is on file is captured as a
+ * walk-in. Once the recruiter is registered the introduction has to be
+ * recorded against them, or the commission is never earned.
  *
- * Reassignment is deliberately refused. A client already attached to one
- * recruiter cannot be moved to another here, because the link decides who is
- * paid - moving it silently would move the money.
+ * Reassignment is refused here: the link decides who gets paid.
  */
 final class ClientRecruiterLinkService
 {

@@ -8,10 +8,9 @@ namespace App\Support;
  * The banks a client or recruiter may be paid into, with their universal
  * branch codes.
  *
- * South African banks each publish one universal branch code that routes to
- * any branch, so capturing a per-branch code is obsolete - the officer picks
- * the bank and the code follows. Held server-side rather than in the SPA so
- * the dropdown and the validation cannot drift apart.
+ * Each bank publishes one code that routes to any branch, so the officer picks
+ * the bank and the code follows. Held server-side so the dropdown and the
+ * validation cannot drift apart.
  */
 final class SouthAfricanBanks
 {

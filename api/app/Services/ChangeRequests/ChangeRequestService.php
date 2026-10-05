@@ -39,10 +39,9 @@ final class ChangeRequestService
     /**
      * What may be asked for, per record type.
      *
-     * A whitelist rather than "anything on the row": a request that could
-     * reach client_number or recruiter_number would let the reference a file
-     * is known by be rewritten, and one that could reach registered_by would
-     * let a file change hands without anyone noticing.
+     * A whitelist, not anything on the row: client_number or recruiter_number
+     * would rewrite the reference a file is known by, and registered_by would
+     * let a file change hands quietly.
      *
      * @var array<class-string, array<int, string>>
      */
@@ -62,10 +61,8 @@ final class ChangeRequestService
     /**
      * What has to be produced before a change is considered.
      *
-     * A request to change a surname is one person repeating what another told
-     * them on the telephone. The ID copy is the thing an administrator can
-     * actually decide on, and a bank statement is the only evidence that an
-     * account belongs to the person about to be paid from it.
+     * A request on its own is one person repeating what another told them on
+     * the phone. The ID copy or bank statement is what can be decided on.
      *
      * @var array<string, string>
      */
@@ -384,10 +381,8 @@ final class ChangeRequestService
     /**
      * Puts the approved documents onto the client's open loan files.
      *
-     * Only files still in flight are touched. A disbursed or declined
-     * application keeps the documents it was actually decided on: overwriting
-     * those would rewrite the evidence behind a decision already taken and
-     * money already paid, which is the opposite of what an audit trail is for.
+     * Only files still in flight. A disbursed or declined application keeps
+     * the documents it was decided on.
      *
      * @return array<int, string>
      */

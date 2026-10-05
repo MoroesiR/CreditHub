@@ -45,8 +45,8 @@ function StageCell({
   const stage = journey?.find((entry) => entry.key === stageKey)
 
   if (!stage) {
-    // Declined files stop after the decision, and walk-ins never reach a
-    // commission stage, so a missing stage means "not on this file's route".
+    // A missing stage means it is not on this file's route: declined, or a
+    // walk-in with no commission.
     return (
       <td className="px-4 py-3 text-ink-300" title="Not part of this file's route">
         n/a

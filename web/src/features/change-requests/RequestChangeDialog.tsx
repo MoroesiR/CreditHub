@@ -21,14 +21,11 @@ export interface EditableField {
 /**
  * Asks an administrator to correct a client or recruiter.
  *
- * Deliberately not an edit form. Both records decide where money goes - the
- * client is paid the loan, the recruiter the commission - so the officer who
- * spots the mistake proposes the change and somebody else agrees to it.
+ * Not an edit form: both records decide where money goes, so the officer who
+ * spots the mistake proposes it and somebody else agrees to it.
  *
- * Laid out in two steps. Nobody edits eleven fields at once, so the form is
- * grouped the way the record is, and the second step restates only what will
- * actually be sent: the request goes to another person, and the officer should
- * see exactly what that person will be asked to approve.
+ * Two steps, because nobody edits eleven fields at once, and the second step
+ * restates exactly what the administrator will be asked to approve.
  */
 export function RequestChangeDialog({
   subjectKind,

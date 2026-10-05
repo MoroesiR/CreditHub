@@ -90,11 +90,9 @@ final class AgreementService
     /**
      * Records the client's signature.
      *
-     * Two artefacts are kept, and they answer different questions. The drawn
-     * signature is what the client put on the agreement. The photograph is
-     * evidence that the person doing the signing was present at the desk - a
-     * signature alone cannot show that, and it is the part a client disputing
-     * the agreement later would attack.
+     * Two artefacts: the drawn signature, and a photograph showing the person
+     * was at the desk. A signature alone cannot show that, and it is the part
+     * a client disputing the agreement would attack.
      *
      * @param  string  $signature  Data URL of the drawn signature.
      * @param  string|null  $photo  Data URL of the webcam frame.

@@ -11,13 +11,11 @@ use RuntimeException;
  * Issues the reference numbers people quote on the phone: CHC000001,
  * CHR000001, CHL000001.
  *
- * Every reference carries the house prefix CH, so a number is recognisable as
- * CreditHub's wherever it is quoted, followed by one letter for what it
- * identifies - Client, Recruiter, Loan - and a zero-padded sequence. Each
- * sequence counts independently.
+ * House prefix CH, one letter for what it identifies (Client, Recruiter,
+ * Loan), then a zero-padded sequence. Each sequence counts independently.
  *
- * Every call must run inside a transaction the caller owns, so that a number
- * is not consumed when the row it was issued for fails to save.
+ * Must run inside the caller's transaction, so a number is not consumed when
+ * the row it was issued for fails to save.
  */
 final class ReferenceNumberService
 {

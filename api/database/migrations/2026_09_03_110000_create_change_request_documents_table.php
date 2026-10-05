@@ -9,14 +9,11 @@ use Illuminate\Support\Facades\Schema;
 /**
  * The proof attached to a change request.
  *
- * A request to change a surname is worth nothing on its own: the officer is
- * repeating what somebody told them over a telephone. The ID copy is what an
- * administrator actually decides on, and a bank statement is the only evidence
- * that an account belongs to the person being paid.
+ * A request on its own is an officer repeating what they were told on the
+ * phone. The ID copy or bank statement is what the administrator decides on.
  *
  * Held against the request rather than written straight onto the client, so
- * the document that was produced in support of a change stays attached to the
- * change even after the record has moved on.
+ * the proof stays attached to the change after the record has moved on.
  */
 return new class extends Migration
 {

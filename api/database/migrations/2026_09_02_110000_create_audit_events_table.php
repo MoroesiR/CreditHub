@@ -9,13 +9,10 @@ use Illuminate\Support\Facades\Schema;
 /**
  * The audit trail.
  *
- * Who did what, to which record, and when. A lender has to be able to answer
- * that about any file years later - which recruiter a client was attached to
- * on a given date, and who attached them.
+ * Who did what, to which record, and when, answerable years later.
  *
- * Events are append-only: there is a created_at and no updated_at, no soft
- * delete, and nothing in the application updates a row once written. An audit
- * trail that can be edited is not one.
+ * Append-only: created_at and no updated_at, no soft delete, and nothing in
+ * the application updates a row once written.
  */
 return new class extends Migration
 {

@@ -10,15 +10,11 @@ import { api } from '@/lib/api'
 type Source = { path: string; file?: never } | { file: File; path?: never }
 
 /**
- * Shows a document without ever exposing a URL to it.
+ * Shows a document without exposing a URL to it.
  *
- * A stored file lives on the private disk and is only handed over on an
- * authenticated request, so it is fetched as a blob and rendered from an
- * object URL held for as long as the modal is open. A file chosen in the
- * browser needs no request at all and is read straight off disk.
- *
- * Either way the object URL is revoked on close: one left registered is a copy
- * of a payslip sitting in the tab until the page is reloaded.
+ * A stored file is fetched as a blob on an authenticated request and rendered
+ * from an object URL; a file picked in the browser is read straight off disk.
+ * The URL is revoked on close, or a payslip stays in the tab.
  */
 export function DocumentModal({
   path,

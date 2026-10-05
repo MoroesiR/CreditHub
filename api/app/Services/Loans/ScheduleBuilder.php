@@ -11,16 +11,12 @@ use Illuminate\Support\Carbon;
 /**
  * Writes the repayment schedule when the money goes out.
  *
- * Each instalment is split into what it is actually made of. Interest is
- * charged on the balance still owed at the start of the month, so it falls as
- * the loan runs down; capital is whatever is left of the instalment after the
- * interest is met, so it rises. The service fee is flat and sits outside that
- * arithmetic entirely.
+ * Interest is charged on the balance at the start of the month, so it falls as
+ * the loan runs down and capital rises to match. The service fee is flat and
+ * sits outside that.
  *
- * Rounding is settled on the last instalment rather than spread across the
- * term. Every other row is a round number of cents, and the final one carries
- * whatever the rounding left over, so the schedule adds up to the balance
- * exactly instead of leaving a few cents outstanding on a settled loan.
+ * Rounding is settled on the last instalment, so the schedule clears the
+ * balance exactly rather than leaving cents on a settled loan.
  */
 final class ScheduleBuilder
 {

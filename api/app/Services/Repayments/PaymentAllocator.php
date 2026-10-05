@@ -10,16 +10,13 @@ use DateTimeImmutable;
 /**
  * Splits a receipt across what the client owes.
  *
- * The National Credit Act prescribes the order in section 126(3) and it is
- * not the lender's to choose: interest first, then fees and charges, then
- * capital. A client who pays short therefore still clears the month's interest
- * and fee, so the shortfall lands on capital and the loan simply runs longer,
- * rather than the lender helping itself to capital and leaving charges to
- * accumulate.
+ * Section 126(3) of the National Credit Act sets the order and it is not the
+ * lender's to choose: interest, then fees and charges, then capital. A short
+ * payment still clears the month's charges, so the shortfall lands on capital
+ * and the loan runs longer.
  *
- * Only what has actually fallen due is charged for. A client paying early is
- * not billed for interest that has not accrued yet, so the surplus goes
- * against capital and reduces what they owe.
+ * Only what has fallen due is charged for, so an early payment reduces capital
+ * rather than prepaying interest that has not accrued.
  */
 final class PaymentAllocator
 {

@@ -7,23 +7,14 @@ namespace App\Services\Loans;
 use App\Support\FeeSchedule;
 
 /**
- * Prices a loan.
+ * Prices a loan on reducing balance: interest on what is still owed, not on
+ * the original advance.
  *
- * Reducing balance, the way an amortising credit agreement actually works:
- * interest is charged on what is still owed, not on the original advance, so
- * the instalment is lower than a flat-rate calculation would suggest and the
- * quote survives comparison with any other lender's.
+ * The initiation fee is capitalised, so it carries interest with the rest of
+ * the balance. The service fee is flat and sits outside the amortisation.
  *
- * Three things make up what a client pays, and they behave differently. The
- * initiation fee is capitalised, so it is financed alongside the advance and
- * carries interest like the rest of the balance. Interest accrues on the
- * reducing balance. The service fee is a flat monthly charge that earns
- * nothing and reduces nothing, so it sits on top of the instalment rather
- * than inside the amortisation.
- *
- * The rate is held here rather than typed in per application. An officer who
- * can set the rate on a file can price a loan differently for one client than
- * another, which is exactly what a lender must be able to show it does not do.
+ * The rate lives here and is never taken from the request, so one client
+ * cannot be priced differently from another.
  */
 final class InstalmentCalculator
 {
@@ -100,12 +91,8 @@ final class InstalmentCalculator
     }
 
     /**
-     * Walks the loan down month by month.
-     *
-     * Interest is charged on what is still owed at the start of the month, so
-     * it falls as the balance does and the capital portion rises to match. The
-     * last instalment clears the remaining balance rather than following the
-     * formula, which is where the rounding across the term is absorbed.
+     * Walks the loan down month by month. The last instalment clears whatever
+     * is left rather than following the formula, which absorbs the rounding.
      *
      * @return array<int, array{interest: float, capital: float, balance: float}>
      */
