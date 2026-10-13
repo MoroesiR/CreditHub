@@ -14,6 +14,14 @@ import { errorMessage } from '@/lib/api'
 import { formatDate, formatMoney } from '@/lib/format'
 import type { LoanBookRow } from '@/types/repayments'
 
+const BAND_LABEL: Record<string, string> = {
+  current: 'Up to date',
+  '1-30': '1 to 30 days',
+  '31-60': '31 to 60 days',
+  '61-90': '61 to 90 days',
+  '90+': 'Over 90 days',
+}
+
 function today(): string {
   return new Date().toISOString().slice(0, 10)
 }
@@ -25,6 +33,7 @@ export function RepaymentsPage() {
   const [term, setTerm] = useState('')
   const [search, setSearch] = useState('')
   const [openLoan, setOpenLoan] = useState<LoanBookRow | null>(null)
+  const [bucket, setBucket] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const [amount, setAmount] = useState('')
@@ -51,6 +60,10 @@ export function RepaymentsPage() {
     queryFn: () => fetchRepayments(openLoan?.id ?? 0),
     enabled: openLoan !== null,
   })
+
+  const visible = (data?.data ?? []).filter(
+    (loan) => bucket === null || loan.arrears_age.bucket === bucket,
+  )
 
   async function refresh() {
     await queryClient.invalidateQueries({ queryKey: ['loans'] })
@@ -137,6 +150,44 @@ export function RepaymentsPage() {
         </section>
       )}
 
+      {data && (
+        <section>
+          <h2 className="text-sm font-medium text-ink-900">How old the arrears are</h2>
+          <p className="mt-1 text-sm text-ink-500">
+            Counted from the oldest instalment a payment has not reached. Pick a band to work
+            through it.
+          </p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {data.meta.ageing.map((band) => (
+              <button
+                key={band.bucket}
+                type="button"
+                onClick={() => setBucket(bucket === band.bucket ? null : band.bucket)}
+                disabled={band.accounts === 0}
+                className={`rounded-md border px-3 py-2 text-left transition-colors disabled:opacity-50 ${
+                  bucket === band.bucket
+                    ? 'border-brand-500 bg-brand-50'
+                    : 'border-ink-200 bg-white hover:border-ink-300'
+                }`}
+              >
+                <span className="block text-xs font-medium text-ink-500">
+                  {BAND_LABEL[band.bucket] ?? band.bucket}
+                </span>
+                <span className="tabular mt-0.5 block text-lg font-semibold text-ink-900">
+                  {band.accounts}
+                </span>
+                {band.arrears > 0 && (
+                  <span className="tabular block text-xs text-bad-700">
+                    {formatMoney(band.arrears)}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <input
         type="search"
         value={term}
@@ -153,13 +204,15 @@ export function RepaymentsPage() {
         <p className="rounded-lg border border-bad-200 bg-bad-50 p-4 text-sm text-bad-700">
           The loan book could not be loaded.
         </p>
-      ) : data.data.length === 0 ? (
+      ) : visible.length === 0 ? (
         <p className="rounded-lg border border-dashed border-ink-300 bg-white p-8 text-center text-sm text-ink-500">
-          No loans have been disbursed yet, so there is nothing to collect.
+          {bucket === null
+            ? 'No loans have been disbursed yet, so there is nothing to collect.'
+            : 'No accounts in that band.'}
         </p>
       ) : (
         <ul className="space-y-3">
-          {data.data.map((loan) => (
+          {visible.map((loan) => (
             <li key={loan.id} className="rounded-lg border border-ink-200 bg-white p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -176,7 +229,7 @@ export function RepaymentsPage() {
                       </span>
                     ) : loan.account.is_in_arrears ? (
                       <span className="rounded-full bg-bad-50 px-2.5 py-1 text-xs font-medium text-bad-700 ring-1 ring-bad-200">
-                        {loan.account.months_behind} instalments behind
+                        {loan.arrears_age.days} days behind
                       </span>
                     ) : (
                       <span className="rounded-full bg-good-50 px-2.5 py-1 text-xs font-medium text-good-800 ring-1 ring-good-200">
@@ -200,7 +253,8 @@ export function RepaymentsPage() {
                   </p>
                   {loan.account.arrears > 0 && (
                     <p className="mt-1 text-xs font-medium text-bad-700">
-                      {formatMoney(loan.account.arrears)} in arrears
+                      {formatMoney(loan.account.arrears)} in arrears, {loan.account.months_behind}{' '}
+                      instalments
                     </p>
                   )}
 

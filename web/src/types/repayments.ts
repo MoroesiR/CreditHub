@@ -14,6 +14,18 @@ export interface LoanAccountSummary {
   next_due_on: string | null
 }
 
+export interface ArrearsAge {
+  days: number
+  bucket: string
+  oldest_unpaid_due_on: string | null
+}
+
+export interface AgeingBucket {
+  bucket: string
+  accounts: number
+  arrears: number
+}
+
 export interface LoanBookRow {
   id: number
   application_number: string
@@ -24,6 +36,7 @@ export interface LoanBookRow {
   term_months: number
   disbursed_on: string | null
   account: LoanAccountSummary
+  arrears_age: ArrearsAge
 }
 
 export interface RepaymentMethodOption {
@@ -37,6 +50,7 @@ export interface LoanBook {
     total_outstanding: number
     total_arrears: number
     accounts_in_arrears: number
+    ageing: AgeingBucket[]
     methods: RepaymentMethodOption[]
   }
 }
