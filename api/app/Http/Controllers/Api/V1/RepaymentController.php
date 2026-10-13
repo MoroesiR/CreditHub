@@ -11,6 +11,7 @@ use App\Http\Requests\Api\V1\Repayments\StoreRepaymentRequest;
 use App\Http\Resources\LoanRepaymentResource;
 use App\Models\LoanApplication;
 use App\Models\LoanRepayment;
+use App\Services\Repayments\ArrearsAge;
 use App\Services\Repayments\LoanAccount;
 use App\Services\Repayments\RepaymentService;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +24,7 @@ final class RepaymentController extends Controller
     public function __construct(
         private readonly RepaymentService $repayments,
         private readonly LoanAccount $accounts,
+        private readonly ArrearsAge $ageing,
     ) {}
 
     /**
@@ -62,6 +64,7 @@ final class RepaymentController extends Controller
                 'term_months' => $loan->term_months,
                 'disbursed_on' => $loan->disbursement?->paid_at?->toDateString(),
                 'account' => $account,
+                'arrears_age' => $this->ageing->for($loan),
             ];
         });
 
@@ -71,6 +74,16 @@ final class RepaymentController extends Controller
                 'total_outstanding' => round($rows->sum(fn (array $row): float => $row['account']['balance']), 2),
                 'total_arrears' => round($rows->sum(fn (array $row): float => $row['account']['arrears']), 2),
                 'accounts_in_arrears' => $rows->filter(fn (array $row): bool => $row['account']['is_in_arrears'])->count(),
+                // Counts per bucket, so the desk can see where the book is
+                // aging rather than only what it totals.
+                'ageing' => array_map(
+                    static fn (string $bucket): array => [
+                        'bucket' => $bucket,
+                        'accounts' => $rows->filter(fn (array $row): bool => $row['arrears_age']['bucket'] === $bucket)->count(),
+                        'arrears' => round($rows->filter(fn (array $row): bool => $row['arrears_age']['bucket'] === $bucket)->sum(fn (array $row): float => $row['account']['arrears']), 2),
+                    ],
+                    ArrearsAge::BUCKETS,
+                ),
                 'methods' => array_map(
                     static fn (string $value): array => [
                         'value' => $value,
