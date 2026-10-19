@@ -19,7 +19,7 @@ them. Every change is written to an append-only audit trail as it happens.
 
 | | |
 |---|---|
-| API | Laravel 13, PHP 8.3+, JSON only |
+| API | Laravel 13, PHP 8.4+, JSON only |
 | Auth | Sanctum bearer tokens |
 | Database | MySQL 8 or MariaDB 10.4+ |
 | Front end | React 19, TypeScript, Vite, TanStack Query, React Hook Form + Zod, Tailwind 4 |
@@ -201,7 +201,7 @@ Approving the request replaces the matching document on the client's file.
 
 ## Running it locally
 
-**Requirements:** PHP 8.3+, Composer, Node 20+, MySQL 8 or MariaDB 10.4+.
+**Requirements:** PHP 8.4+, Composer, Node 20+, MySQL 8 or MariaDB 10.4+.
 
 ### API
 
