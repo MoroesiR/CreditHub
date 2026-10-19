@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\SpaController;
 use Illuminate\Support\Facades\Route;
 
 /*
-| This application serves JSON only; the user interface is the React SPA in
-| /web. The single route below identifies the service to anything that lands
-| on the root URL. Health checks use /up.
+| The API serves JSON under /api/v1. Where the built React application has
+| been copied into public/, every other path hands back its index.html so the
+| browser can route it. Health checks use /up.
 */
 
-Route::get('/', fn (): array => [
-    'service' => config('app.name'),
-    'api' => url('/api/v1'),
-    'health' => url('/up'),
-]);
+Route::get('/', SpaController::class);
+Route::fallback(SpaController::class);

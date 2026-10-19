@@ -5,6 +5,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
 import { FullPageSpinner } from '@/components/Spinner'
+import { DemoAccounts } from '@/features/auth/DemoAccounts'
 import { useAuth } from '@/features/auth/useAuth'
 import { errorMessage } from '@/lib/api'
 
@@ -26,6 +27,7 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginFields>({ resolver: zodResolver(loginSchema) })
 
@@ -165,6 +167,13 @@ export function LoginPage() {
               </p>
             </div>
           </div>
+
+          <DemoAccounts
+            onPick={(email) => {
+              setValue('email', email)
+              setValue('password', 'password')
+            }}
+          />
         </div>
       </main>
 

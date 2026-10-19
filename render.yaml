@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: credithub-demo
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: demo
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://credithub-demo.onrender.com
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/database/database.sqlite
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: array
+      - key: CACHE_STORE
+        value: file
