@@ -4,6 +4,11 @@ A loan management system for a small lender: register the client, work out what
 they can afford, decide the application, sign the agreement, pay the money out,
 and collect it back, with recruiter commission priced and paid alongside it.
 
+**Live demo: <https://credithub-demo.onrender.com>** — sign in as any of the six
+roles with the accounts listed on the page. Every client, loan and payment in it
+is made up, and the book is rebuilt on each deploy. It sleeps when nobody is
+using it, so the first request can take up to a minute.
+
 The point of the design is **separation of duties**. Originating a loan,
 approving it, releasing the funds and receipting repayments are four different
 permissions held by four different roles, and no role holds more than one of
